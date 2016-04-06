@@ -1,5 +1,7 @@
 package main
 
+import "log"
+
 type SchemaType string
 
 const (
@@ -28,6 +30,5 @@ func SchemaTypeFromString(str string) (SchemaType) {
 			return v
 		}
 	}
-	println(strj
-	panic(str)
+	log.Fatal("undefined type")
 }
