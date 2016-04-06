@@ -1,7 +1,5 @@
 package main
 
-import "log"
-
 type SchemaType string
 
 const (
