@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"reflect"
+	"strings"
+	"github.com/xeipuuv/gojsonpointer"
 )
 
 type JsonSchema struct {
@@ -79,3 +81,17 @@ func (schema *JsonSchema) IsRequired(key string) (bool) {
 	return false
 }
 
+func (schema JsonSchema) GetRefSchema(pointer *gojsonpointer.JsonPointer) (JsonSchema) {
+	path := strings.Split(pointer.String(), "/")
+	s := schema
+	i := 0
+	for i < len(path) {
+		p := path[i]
+		if p != "" && p == "definitions" {
+			i++
+			s = s.Definitions[path[i]]
+		}
+		i++
+	}
+	return s
+}
