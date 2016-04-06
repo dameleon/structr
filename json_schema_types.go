@@ -30,5 +30,5 @@ func SchemaTypeFromString(str string) (SchemaType) {
 			return v
 		}
 	}
-	log.Fatal("undefined type")
+	panic("undefined type")
 }
