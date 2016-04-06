@@ -12,7 +12,7 @@ type jsonSchemaLoader struct {
 }
 
 func (l* jsonSchemaLoader) Load(ref gojsonreference.JsonReference) (JsonSchema) {
-	path := getUniquePath(ref)
+	path := ref.GetUrl().RequestURI()
 	if _, ok := l.pool[path]; !ok {
 		var schema JsonSchema
 		if ref.HasFullFilePath || ref.HasFileScheme {
@@ -54,7 +54,3 @@ func GetJsonSchemaLoader() *jsonSchemaLoader {
 	return instance
 }
 
-func getUniquePath(ref gojsonreference.JsonReference) (string) {
-	url := ref.GetUrl()
-	return url.RequestURI()
-}
