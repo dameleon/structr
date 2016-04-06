@@ -67,3 +67,15 @@ func (schema *JsonSchema) GetItemList() ([]JsonSchema) {
 	return res
 }
 
+func (schema *JsonSchema) IsRequired(key string) (bool) {
+	if schema.Required == nil {
+		return false
+	}
+	for _, r := range schema.Required {
+		if key == r {
+			return true
+		}
+	}
+	return false
+}
+
