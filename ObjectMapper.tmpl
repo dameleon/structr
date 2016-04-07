@@ -1,0 +1,15 @@
+class {{.Id}}: Mappable {
+    {{range .Children}}
+    var {{.Id}}:{{.Type}}?
+    {{end}}
+
+    required init?(_ map: Map) {
+    }
+
+    func mapping(map: Map) {
+        {{range .Children}}
+        {{.Id}} <- map["{{.Type}}"]
+        {{end}}
+    }
+}
+
