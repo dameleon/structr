@@ -10,11 +10,11 @@ type JsonSchemaBundler interface {
 }
 
 type bundler struct {
-	rootRef *gojsonreference.JsonReference
 	loader JsonSchemaLoader
+	rootRef gojsonreference.JsonReference
 }
 
-func NewJsonSchemaBundler(loader JsonSchemaLoader, rootRef *gojsonreference.JsonReference) (JsonSchemaBundler) {
+func NewJsonSchemaBundler(loader JsonSchemaLoader, rootRef gojsonreference.JsonReference) (JsonSchemaBundler) {
 	b := &bundler{
 		loader,
 		rootRef,
@@ -27,6 +27,10 @@ func (b *bundler) GetRootSchema() (JsonSchema) {
 }
 
 func (b *bundler) GetSchema(refString string) (JsonSchema) {
-	return b.loader.Load(NewRelativeJsonReference(b.rootRef, NewJsonReference(refString)))
+	ref := NewRelativeJsonReference(b.rootRef, NewJsonReference(refString))
+	schema := b.loader.Load(ref)
+	if schema.Ref != "" {
+		return b.GetSchema(schema.Ref)
+	}
+	return schema
 }
-
