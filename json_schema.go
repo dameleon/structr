@@ -96,9 +96,4 @@ func (schema JsonSchema) GetRefSchema(pointer *gojsonpointer.JsonPointer) (JsonS
 	return s
 }
 
-func (schema JsonSchema) GetSchemaName() (string) {
-	if schema.Id != "" {
-		return schema.Id
-	}
 
-}
