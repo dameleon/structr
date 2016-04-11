@@ -1,9 +1,7 @@
 package main
 
-type SchemaType string
-
 const (
-	SchemaTypeNull SchemaType = "null"
+	SchemaTypeNull = "null"
 	SchemaTypeBoolean = "boolean"
 	SchemaTypeString = "string"
 	SchemaTypeInteger = "integer"
@@ -12,7 +10,7 @@ const (
 	SchemaTypeArray = "array"
 )
 
-var SchemaTypes = [...]SchemaType{
+var SchemaTypes = [...]string{
 	SchemaTypeNull,
 	SchemaTypeBoolean,
 	SchemaTypeString,
@@ -22,11 +20,11 @@ var SchemaTypes = [...]SchemaType{
 	SchemaTypeArray,
 }
 
-func SchemaTypeFromString(str string) (SchemaType) {
-	for _, v := range SchemaTypes {
-		if str == string(v) {
-			return v
-		}
+func IsPrimitiveSchemaType(target string) (bool) {
+	switch target {
+	case SchemaTypeNull, SchemaTypeBoolean, SchemaTypeString, SchemaTypeInteger, SchemaTypeNumber:
+		return true
 	}
-	panic("undefined type")
+	return false
 }
+
