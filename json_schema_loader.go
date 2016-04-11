@@ -7,11 +7,19 @@ import (
 	"encoding/json"
 )
 
+type JsonSchemaLoader interface {
+	Load(ref gojsonreference.JsonReference) (JsonSchema)
+}
+
+func NewJsonSchemaLoader() (JsonSchemaLoader) {
+	return &jsonSchemaLoader{ make(map[string]JsonSchema) }
+}
+
 type jsonSchemaLoader struct {
 	pool map[string]JsonSchema
 }
 
-func (l* jsonSchemaLoader) Load(ref gojsonreference.JsonReference) (JsonSchema) {
+func (l *jsonSchemaLoader) Load(ref gojsonreference.JsonReference) (JsonSchema) {
 	path := ref.GetUrl().RequestURI()
 	if _, ok := l.pool[path]; !ok {
 		var schema JsonSchema
@@ -28,12 +36,12 @@ func (l* jsonSchemaLoader) Load(ref gojsonreference.JsonReference) (JsonSchema) 
 	return l.pool[path]
 }
 
-func (l jsonSchemaLoader) loadFromRemote(ref gojsonreference.JsonReference) (JsonSchema) {
+func (l *jsonSchemaLoader) loadFromRemote(ref gojsonreference.JsonReference) (JsonSchema) {
 	// TODO
 	return JsonSchema{}
 }
 
-func (l jsonSchemaLoader) loadFromFile(ref gojsonreference.JsonReference) (JsonSchema) {
+func (l *jsonSchemaLoader) loadFromFile(ref gojsonreference.JsonReference) (JsonSchema) {
 	j, err := ioutil.ReadFile(ref.GetUrl().Path)
 	if err != nil {
 		log.Fatal(err)
@@ -44,13 +52,3 @@ func (l jsonSchemaLoader) loadFromFile(ref gojsonreference.JsonReference) (JsonS
 	}
 	return s
 }
-
-var instance *jsonSchemaLoader
-
-func GetJsonSchemaLoader() *jsonSchemaLoader {
-	if instance == nil {
-		instance = &jsonSchemaLoader{ make(map[string]JsonSchema) }
-	}
-	return instance
-}
-
