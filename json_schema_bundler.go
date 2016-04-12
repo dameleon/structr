@@ -54,11 +54,11 @@ func (b *bundler) GetReferredBundle(ref gojsonreference.JsonReference) (bundle) 
 	panic("undefined bundle")
 }
 
-func (b *bundler) GetBundles() ([]bundle) {
+func (b *bundler) GetBundles() (map[string]bundle) {
 	return b.bundles
 }
 
-func (b *bundler) GetReferredBundles() ([]bundle) {
+func (b *bundler) GetReferredBundles() (map[string]bundle) {
 	return b.referredBundles
 }
 
@@ -81,4 +81,8 @@ func (b bundle) GetName() (string) {
 	}
 	basename := filepath.Base(b.ref.GetUrl().String())
 	return strings.Replace(basename, filepath.Ext(basename), "", 1)
+}
+
+func (b bundle) CreateChild(schema JsonSchema) (bundle) {
+	return bundle{ b.ref, schema }
 }
