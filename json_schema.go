@@ -96,4 +96,21 @@ func (schema JsonSchema) GetRefSchema(pointer *gojsonpointer.JsonPointer) (JsonS
 	return s
 }
 
-
+func (schema JsonSchema) GetRefList() ([]string) {
+	res := []string{}
+	switch schema.Type {
+	case SchemaTypeObject:
+		for _, s := range schema.Properties {
+			res = append(res, s.GetRefList()...)
+		}
+	case SchemaTypeArray:
+		for _, s := range schema.GetItemList() {
+			res = append(res, s.GetRefList()...)
+		}
+	default:
+		if schema.Ref != "" {
+			res = append(res, schema.Ref)
+		}
+	}
+	return res
+}
