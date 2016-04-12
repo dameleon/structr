@@ -3,7 +3,7 @@ package main
 type StructureNode struct {
 	Name string
 	Properties []PropertyNode
-	Dependencies []StructureNode
+	Children []StructureNode
 }
 
 type PropertyNode struct {

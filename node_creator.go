@@ -22,7 +22,7 @@ func (creator jsonSchemaNodeCreator) CreateStructureNode(name string, rootSchema
 		panic("root schema must be type of object")
 	}
 	properties := []PropertyNode{}
-	dependencyMap := make(map[string]StructureNode)
+	childrenMap := make(map[string]StructureNode)
 	for key, schema := range rootSchema.Properties {
 		refString := ""
 		if schema.Ref != "" {
@@ -32,28 +32,28 @@ func (creator jsonSchemaNodeCreator) CreateStructureNode(name string, rootSchema
 		// create property
 		prop := creator.CreatePropertyNode(key, schema, rootSchema.IsRequired(key), refString)
 		properties = append(properties, prop)
-		// create dependency
-		if innerType := prop.Type.InnerType; innerType != nil {
+		// create children
+		if innerType := prop.Type.InnerType; innerType != nil && refString == "" {
 			name := innerType.EntityName()
 			s := schema
 			if s.Type == SchemaTypeArray {
 				s = schema.GetItemList()[0]
 			}
 			if s.Type == SchemaTypeObject {
-				if _, ok := dependencyMap[name]; !ok {
-					dependencyMap[name] = creator.CreateStructureNode(name, s)
+				if _, ok := childrenMap[name]; !ok {
+					childrenMap[name] = creator.CreateStructureNode(name, s)
 				}
 			}
 		}
 	}
-	dependencies := []StructureNode{}
-	for _, v := range dependencyMap {
-		dependencies = append(dependencies, v)
+	children := []StructureNode{}
+	for _, v := range childrenMap {
+		children = append(children, v)
 	}
 	return StructureNode{
 		name,
 		properties,
-		dependencies,
+		children,
 	}
 }
 

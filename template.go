@@ -41,9 +41,9 @@ func createFuncMap(context Context) (template.FuncMap) {
 		}
 		return typ.Name
 	}
-	var extractDependencies = func(dependencies []StructureNode) (string) {
+	var extractStructures = func(structures []StructureNode) (string) {
 		var res bytes.Buffer
-		for _, node := range dependencies {
+		for _, node := range structures {
 			tmpl := NewContextualTemplate(context, node.Name)
 			tmpl.Execute(&res, node)
 		}
@@ -54,7 +54,7 @@ func createFuncMap(context Context) (template.FuncMap) {
 		"toUpperCamelCase": toUpperCamelCase,
 		"toLowerCamelCase": toLowerCamelCase,
 		"translateTypeName": translateTypeName,
-		"extractDependencies": extractDependencies,
+		"extractStructures": extractStructures,
 	}
 }
 
