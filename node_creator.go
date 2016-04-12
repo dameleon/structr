@@ -1,11 +1,13 @@
 package main
 
-import "strings"
+import (
+	"strings"
+)
 
 type NodeCreator interface {
 	CreateStructureNode(bundle bundle) (StructureNode)
-	CreatePropertyNode(name string, schema JsonSchema, isRequired bool, refString string) (PropertyNode)
-	CreateTypeNode(schema JsonSchema, additionalKey string, refString string) (TypeNode)
+	CreatePropertyNode(name string, bundle bundle, isRequired bool, refString string) (PropertyNode)
+	CreateTypeNode(bundle bundle, additionalKey string, refString string) (TypeNode)
 }
 
 func NewJsonSchemaNodeCreator(context Context, bundler JsonSchemaBundler) (NodeCreator) {
@@ -17,32 +19,32 @@ type jsonSchemaNodeCreator struct {
 	bundler JsonSchemaBundler
 }
 
-func (creator jsonSchemaNodeCreator) CreateStructureNode(bundle bundle) (StructureNode) {
-	rootSchema := bundle.schema
+func (creator jsonSchemaNodeCreator) CreateStructureNode(rootBundle bundle) (StructureNode) {
+	rootSchema := rootBundle.schema
 	if rootSchema.Type != SchemaTypeObject {
 		panic("root schema must be type of object")
 	}
 	properties := []PropertyNode{}
 	childrenMap := make(map[string]StructureNode)
 	for key, schema := range rootSchema.Properties {
-		refString := ""
-		if schema.Ref != "" {
-			refString = schema.Ref
-			schema = creator.bundler.GetReferredBundle(bundle.GetRelativeJsonReference(refString)).schema
+		refString := schema.Ref
+		if refString != "" {
+			schema = creator.bundler.GetReferredBundle(rootBundle.GetRelativeJsonReference(refString)).schema
 		}
+		bundle := rootBundle.CreateChild(schema)
 		// create property
-		prop := creator.CreatePropertyNode(key, schema, rootSchema.IsRequired(key), refString)
+		prop := creator.CreatePropertyNode(key, bundle, rootSchema.IsRequired(key), refString)
 		properties = append(properties, prop)
 		// create children
 		if innerType := prop.Type.InnerType; innerType != nil && refString == "" {
 			name := innerType.EntityName()
-			s := schema
-			if s.Type == SchemaTypeArray {
-				s = schema.GetItemList()[0]
+			schema := schema
+			if schema.Type == SchemaTypeArray {
+				schema = schema.GetItemList()[0]
 			}
-			if s.Type == SchemaTypeObject {
+			if schema.Type == SchemaTypeObject {
 				if _, ok := childrenMap[name]; !ok {
-					childrenMap[name] = creator.CreateStructureNode(NewBundle(bundle.ref, s))
+					childrenMap[name] = creator.CreateStructureNode(bundle.CreateChild(schema))
 				}
 			}
 		}
@@ -52,27 +54,32 @@ func (creator jsonSchemaNodeCreator) CreateStructureNode(bundle bundle) (Structu
 		children = append(children, v)
 	}
 	return StructureNode{
-		bundle.GetName(),
+		rootBundle.GetName(),
 		properties,
 		children,
 	}
 }
 
-func (creator jsonSchemaNodeCreator) CreatePropertyNode(name string, schema JsonSchema, isRequired bool, refString string) (PropertyNode) {
+func (creator jsonSchemaNodeCreator) CreatePropertyNode(name string, bundle bundle, isRequired bool, refString string) (PropertyNode) {
 	return PropertyNode{
 		name,
-		creator.CreateTypeNode(schema, name, refString),
+		creator.CreateTypeNode(bundle, name, refString),
 		isRequired,
 	}
 }
 
-func (creator jsonSchemaNodeCreator) CreateTypeNode(schema JsonSchema, additionalKey string, refString string) (TypeNode) {
+func (creator jsonSchemaNodeCreator) CreateTypeNode(bundle bundle, additionalKey string, refString string) (TypeNode) {
+	schema := bundle.schema
 	if IsPrimitiveSchemaType(schema.Type) {
 		return creator.newSpecifiedTypeNode(schema.Type)
 	} else if schema.Type == SchemaTypeArray {
 		// NOTE: not support multiple item types
-		item := schema.GetItemList()[0]
-		return creator.newArrayTypeNode(creator.CreateTypeNode(item, additionalKey, item.Ref))
+		innerBundle := bundle.CreateChild(schema.GetItemList()[0])
+		refString := innerBundle.schema.Ref
+		if refString != "" {
+			innerBundle = creator.bundler.GetReferredBundle(bundle.GetRelativeJsonReference(refString))
+		}
+		return creator.newArrayTypeNode(creator.CreateTypeNode(innerBundle, additionalKey, refString))
 	} else if schema.Type == SchemaTypeObject {
 		typ := additionalKey
 		if schema.Id != "" {
