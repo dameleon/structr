@@ -3,7 +3,7 @@ package main
 import "strings"
 
 type NodeCreator interface {
-	CreateStructureNode(name string, schema JsonSchema) (StructureNode)
+	CreateStructureNode(bundle bundle) (StructureNode)
 	CreatePropertyNode(name string, schema JsonSchema, isRequired bool, refString string) (PropertyNode)
 	CreateTypeNode(schema JsonSchema, additionalKey string, refString string) (TypeNode)
 }
@@ -17,7 +17,8 @@ type jsonSchemaNodeCreator struct {
 	bundler JsonSchemaBundler
 }
 
-func (creator jsonSchemaNodeCreator) CreateStructureNode(name string, rootSchema JsonSchema) (StructureNode) {
+func (creator jsonSchemaNodeCreator) CreateStructureNode(bundle bundle) (StructureNode) {
+	rootSchema := bundle.schema
 	if rootSchema.Type != SchemaTypeObject {
 		panic("root schema must be type of object")
 	}
@@ -27,7 +28,7 @@ func (creator jsonSchemaNodeCreator) CreateStructureNode(name string, rootSchema
 		refString := ""
 		if schema.Ref != "" {
 			refString = schema.Ref
-			schema = creator.bundler.GetSchema(schema.Ref)
+			schema = creator.bundler.GetReferredBundle(bundle.GetRelativeJsonReference(refString)).schema
 		}
 		// create property
 		prop := creator.CreatePropertyNode(key, schema, rootSchema.IsRequired(key), refString)
@@ -41,7 +42,7 @@ func (creator jsonSchemaNodeCreator) CreateStructureNode(name string, rootSchema
 			}
 			if s.Type == SchemaTypeObject {
 				if _, ok := childrenMap[name]; !ok {
-					childrenMap[name] = creator.CreateStructureNode(name, s)
+					childrenMap[name] = creator.CreateStructureNode(NewBundle(bundle.ref, s))
 				}
 			}
 		}
@@ -51,7 +52,7 @@ func (creator jsonSchemaNodeCreator) CreateStructureNode(name string, rootSchema
 		children = append(children, v)
 	}
 	return StructureNode{
-		name,
+		bundle.GetName(),
 		properties,
 		children,
 	}
