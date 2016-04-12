@@ -4,41 +4,56 @@ import (
 	"github.com/codegangsta/cli"
 	"os"
 	"path/filepath"
-	"log"
-	"github.com/k0kubun/pp"
 )
 
 func main() {
 	app := cli.NewApp()
 	app.Name = "structr"
-	app.Usage = "generate struct"
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name: "config",
+			Value: "",
+			Usage: "configuration for structr",
+		},
+		cli.StringFlag{
+			Name: "outDir",
+			Value: "",
+			Usage: "output directory for generated structure",
+		},
+	}
 	app.Action = func(c *cli.Context) {
-		file := c.Args().First()
-		if file == "" {
-			file = "hoge.json"
+		args := c.Args()
+		if len(args) < 1 {
+			cli.ShowAppHelp(c)
+			os.Exit(1)
 		}
-		if !filepath.IsAbs(file) {
-			cwd, err := os.Getwd()
-			if err != nil {
-				log.Fatal(err)
+		context, err := NewContext(c.String("config"), args[len(args) - 1], c.String("outDir"))
+		if err != nil {
+			panic(err)
+		}
+		files, err := filepath.Glob(context.InputPath)
+		if err != nil {
+			panic(err)
+		}
+		type structureHolder struct {
+			main []StructureNode
+			dependencies map[string]StructureNode
+		}
+		bundler := NewJsonSchemaBundler(NewJsonSchemaLoader())
+		for _, file := range files {
+			if info, _ := os.Stat(file); !info.IsDir() {
+				bundler.AddJsonSchema(file)
 			}
-			file = filepath.Join(cwd, file)
 		}
-		bundler := NewJsonSchemaBundler(NewJsonReference(file))
-		bundler.Bundle()
-		pp.Print(bundler.GetSchema("#/definitions/address"))
-		// parser := json.NewDecoder(file)
-		// var s JsonSchema
-		// e := parser.Decode(&s)
-		// if e != nil {
-		// 	println(e.Error())
-		// 	return
-		// }
-		// node, _ := NewNode(NodeParam{ Id: "hoge", Schema: &s })
-		// tpl := template.Must(template.ParseFiles("ObjectMapper.tmpl"))
-		// if te := tpl.Execute(os.Stdout, node); te != nil {
-		// 	println(te)
-		// }
+		creator := NewJsonSchemaNodeCreator(context, bundler)
+		for _, b := range bundler.GetBundles() {
+			tmpl := NewContextualTemplate(context, b.GetName())
+			tmpl.Execute(os.Stdout, creator.CreateStructureNode(b))
+		}
+		for _, b := range bundler.GetReferredBundles() {
+			tmpl := NewContextualTemplate(context, b.GetName())
+			tmpl.Execute(os.Stdout, creator.CreateStructureNode(b))
+		}
 	}
 	app.Run(os.Args)
 }

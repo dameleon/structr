@@ -7,9 +7,8 @@ import (
 
 type Config struct {
 	TypeTranslateMap    map[string]string `yaml:"type_translate_map"`
-	NestedDependency    bool `yaml:"nested_dependency"`
-	ArrayTypeDefinition string `yaml:"array_type_definition"`
 	OutputFilename      string `yaml:"output_filename"`
+	OutputDependencies  bool `yaml:"output_dependencies"`
 	StructureTemplate   string `yaml:"structure_template"`
 }
 

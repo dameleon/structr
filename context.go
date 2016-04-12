@@ -38,3 +38,7 @@ func NewContext(configFilePath string, inputPath string, outDir string) (Context
 	context.OutputDirPath = outDir
 	return context, nil
 }
+
+func (c Context) OutputsFiles() (bool) {
+	return c.OutputDirPath != ""
+}
