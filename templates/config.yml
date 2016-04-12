@@ -1,0 +1,28 @@
+type_translate_map:
+  string: "String"
+  integer: "Int"
+  number: "Float"
+  boolean: "Bool"
+  null: "nil"
+  array: "[{{.InnerType}}]"
+  object: "{{.InnerType}}"
+output_filename: "{{.Name}}.swift"
+output_dependencies: true
+structure_template: |
+  struct {{.Name}}: Mappable {
+  {{range .Properties}}
+      var {{.Name}}:{{.Type|translateTypeName}}?
+  {{end}}
+
+      required init?(_ map: Map) {
+      }
+
+      func mapping(map: Map) {
+  {{range .Properties}}
+          self.{{.Name}} <- map["{{.Name}}"]
+  {{end}}
+      }
+
+  {{.Children|extractStructures}}
+  }
+
