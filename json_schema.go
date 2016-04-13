@@ -114,3 +114,7 @@ func (schema JsonSchema) GetRefList() ([]string) {
 	}
 	return res
 }
+
+func (schema JsonSchema) HasReference() (bool) {
+	return schema.Ref != ""
+}

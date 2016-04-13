@@ -50,10 +50,6 @@ func main() {
 			tmpl := NewContextualTemplate(context, b.GetName())
 			tmpl.Execute(os.Stdout, creator.CreateStructureNode(b))
 		}
-		for _, b := range bundler.GetReferredBundles() {
-			tmpl := NewContextualTemplate(context, b.GetName())
-			tmpl.Execute(os.Stdout, creator.CreateStructureNode(b))
-		}
 	}
 	app.Run(os.Args)
 }
