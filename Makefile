@@ -9,6 +9,7 @@ testdeps:
 test: testdeps resources
 	go test ./...
 resources:
+	go get -u github.com/jteeuwen/go-bindata/...
 	go-bindata -o resources.go resources/
 build: deps resources
 	go build $(BUILD_FLAGS)
