@@ -3,6 +3,10 @@ build:
   steps:
     - setup-go-workspace
     - script:
-        name: test
+        name: go get
         code: |
-          make test
+          go get -t ./...
+    - script:
+        name: go test
+        code: |
+          go test -v ./...
