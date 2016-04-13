@@ -3,11 +3,12 @@ VERSION = $$(git describe --tags --always --dirty) ($$(git name-rev --name-only 
 BUILD_FLAGS = -ldflags "-X main.Version \"$(VERSION)\" "
 
 resources:
+	go get -u github.com/jteeuwen/go-bindata/...
 	go-bindata -o resources.go resources/
 deps: resources
-	go get -d
+	go get -d ./...
 testdeps: resources
-	go get -d -t
+	go get -d -t ./...
 test: testdeps
 	go test ./...
 build: deps
