@@ -7,6 +7,10 @@ build:
         code: |
           go get -t ./...
     - script:
+        name: make resources
+        code: |
+          make resources
+    - script:
         name: go test
         code: |
           go test -v ./...
