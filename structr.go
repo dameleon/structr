@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-var Version string
+var Version = "0.0.1"
 
 func main() {
 	app := cli.NewApp()
