@@ -5,7 +5,6 @@ import (
 	"os"
 	"errors"
 	"github.com/codegangsta/cli"
-	"github.com/asaskevich/govalidator"
 )
 
 type Context struct {
@@ -37,7 +36,7 @@ func NewContext(configFilePath string, outDir string, args cli.Args) (Context, e
 	}
 	context.OutputDirPath = outDir
 	// register inputs
-	inputs, err := context.createInputs(args)
+	inputs, err := context.createInputs(args, cwd)
 	if err != nil {
 		return context, err
 	}
@@ -45,24 +44,20 @@ func NewContext(configFilePath string, outDir string, args cli.Args) (Context, e
 	return context, nil
 }
 
-func (c Context) createInputs(args cli.Args) ([]string, error) {
+func (c Context) createInputs(args cli.Args, cwd string) ([]string, error) {
 	res := []string{}
 	for _, arg := range args {
-		if govalidator.IsURL(arg) {
-			res = append(res, arg)
-		} else {
-			files, err := filepath.Glob(arg)
+		files, err := filepath.Glob(arg)
+		if err != nil {
+			return res, err
+		}
+		for _, file := range files {
+			info, err := os.Stat(file)
 			if err != nil {
 				return res, err
 			}
-			for _, file := range files {
-				info, err := os.Stat(file)
-				if err != nil {
-					return res, err
-				}
-				if !info.IsDir() {
-					res = append(res, arg)
-				}
+			if !info.IsDir() {
+				res = append(res, filepath.Join(cwd, arg))
 			}
 		}
 	}

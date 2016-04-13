@@ -40,8 +40,23 @@ func (e *fileExporter) Export(node StructureNode) (error) {
 	if err := tmpl.Execute(&buf, node); err != nil {
 		return err
 	}
+	if err := e.mkdirIfNeeded(); err != nil {
+		return err
+	}
 	ioutil.WriteFile(filepath.Join(e.context.OutputDirPath, e.getFileName(node)), buf.Bytes(), os.ModePerm)
 	return nil
+}
+
+func (e *fileExporter) mkdirIfNeeded() (error) {
+	info, err := os.Stat(e.context.OutputDirPath)
+	if info != nil && info.IsDir() {
+		return nil
+	}
+	if os.IsNotExist(err) {
+		return os.MkdirAll(e.context.OutputDirPath, os.ModePerm)
+	}
+	return err
+
 }
 
 func (e *fileExporter) getFileName(node StructureNode) (string) {
