@@ -18,20 +18,10 @@ output_dependencies: true
 
 # Templates for output the structure
 structure_template: |
-  struct {{.Name}}: Mappable {
+  struct {{.Name}} {
   {{range .Properties}}
-      var {{.Name}}:{{.Type|translateTypeName}}?
+      var {{.Name}}: {{.Type|translateTypeName}}?
   {{end}}
-
-      required init?(_ map: Map) {
-      }
-
-      func mapping(map: Map) {
-  {{range .Properties}}
-          self.{{.Name}} <- map["{{.Name}}"]
-  {{end}}
-      }
 
   {{.Children|extractStructures}}
   }
-

@@ -12,7 +12,7 @@ $ go get github.com/dameleon/structr
 
 ## Usage
 
-### 1. Write your configuration file in yaml
+### 1. Write your configuration in yaml file
 
 For example, translating JSONSchema type to swift type.
 
