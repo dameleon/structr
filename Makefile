@@ -2,9 +2,11 @@ VERSION = $$(git describe --tags --always --dirty) ($$(git name-rev --name-only 
 
 BUILD_FLAGS = -ldflags "-X main.Version \"$(VERSION)\" "
 
-deps:
+resources:
+	go-bindata -o resources.go resources/
+deps: resources
 	go get -d
-destdeps:
+testdeps: resources
 	go get -d -t
 test: testdeps
 	go test ./...
@@ -13,4 +15,4 @@ build: deps
 install: deps
 	go install $(BUILD_FLAGS)
 
-.PHONY: deps build install
+.PHONY: resources deps testdeps test build install
