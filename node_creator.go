@@ -1,9 +1,9 @@
 package main
 
 type NodeCreator interface {
-	CreateStructureNode(bundle bundle) (StructureNode)
-	CreatePropertyNode(name string, bundle bundle, isRequired bool) (PropertyNode)
-	CreateTypeNode(bundle bundle, additionalKey string) (TypeNode)
+	CreateStructureNode(bundle Bundle) (StructureNode)
+	CreatePropertyNode(name string, bundle Bundle, isRequired bool) (PropertyNode)
+	CreateTypeNode(bundle Bundle, additionalKey string) (TypeNode)
 }
 
 func NewJsonSchemaNodeCreator(context Context, bundler JsonSchemaBundler) (NodeCreator) {
@@ -15,15 +15,15 @@ type jsonSchemaNodeCreator struct {
 	bundler JsonSchemaBundler
 }
 
-func (creator jsonSchemaNodeCreator) CreateStructureNode(rootBundle bundle) (StructureNode) {
-	rootSchema := rootBundle.schema
+func (creator jsonSchemaNodeCreator) CreateStructureNode(rootBundle Bundle) (StructureNode) {
+	rootSchema := rootBundle.Schema
 	if rootSchema.Type != SchemaTypeObject {
 		panic("root schema must be type of object")
 	}
 	properties := []PropertyNode{}
 	childrenMap := make(map[string]StructureNode)
 	for key, schema := range rootSchema.Properties {
-		var bdl bundle
+		var bdl Bundle
 		if schema.HasReference() {
 			// if current schema designated reference, specify referred bundle to create property
 			bdl = creator.bundler.GetBundle(rootBundle.GetRelativeJsonReference(schema.Ref))
@@ -34,7 +34,7 @@ func (creator jsonSchemaNodeCreator) CreateStructureNode(rootBundle bundle) (Str
 		prop := creator.CreatePropertyNode(key, bdl, rootSchema.IsRequired(key))
 		properties = append(properties, prop)
 		// create children
-		if innerType := prop.Type.InnerType; innerType != nil && !bdl.isReferred {
+		if innerType := prop.Type.InnerType; innerType != nil && !bdl.IsReferred {
 			name := innerType.EntityName()
 			schema := schema
 			if schema.Type == SchemaTypeArray {
@@ -58,7 +58,7 @@ func (creator jsonSchemaNodeCreator) CreateStructureNode(rootBundle bundle) (Str
 	}
 }
 
-func (creator jsonSchemaNodeCreator) CreatePropertyNode(name string, bundle bundle, isRequired bool) (PropertyNode) {
+func (creator jsonSchemaNodeCreator) CreatePropertyNode(name string, bundle Bundle, isRequired bool) (PropertyNode) {
 	return PropertyNode{
 		name,
 		creator.CreateTypeNode(bundle, name),
@@ -66,14 +66,14 @@ func (creator jsonSchemaNodeCreator) CreatePropertyNode(name string, bundle bund
 	}
 }
 
-func (creator jsonSchemaNodeCreator) CreateTypeNode(bdl bundle, additionalKey string) (TypeNode) {
-	schema := bdl.schema
+func (creator jsonSchemaNodeCreator) CreateTypeNode(bdl Bundle, additionalKey string) (TypeNode) {
+	schema := bdl.Schema
 	if IsPrimitiveSchemaType(schema.Type) {
 		return creator.newSpecifiedTypeNode(schema.Type)
 	} else if schema.Type == SchemaTypeArray {
 		// TODO: not support multiple item types
 		childSchema := schema.GetItemList()[0]
-		var innerBundle bundle
+		var innerBundle Bundle
 		if childSchema.HasReference() {
 			innerBundle = creator.bundler.GetBundle(bdl.GetRelativeJsonReference(childSchema.Ref))
 		} else {
@@ -83,7 +83,7 @@ func (creator jsonSchemaNodeCreator) CreateTypeNode(bdl bundle, additionalKey st
 		return creator.newArrayTypeNode(creator.CreateTypeNode(innerBundle, additionalKey))
 	} else if schema.Type == SchemaTypeObject {
 		var typ string
-		if bdl.isReferred {
+		if bdl.IsReferred {
 			typ = bdl.GetName()
 		} else {
 			typ = additionalKey
