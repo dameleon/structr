@@ -9,7 +9,7 @@ type NodeCreator interface {
 }
 
 func NewJsonSchemaNodeCreator(context Context, bundler JsonSchemaBundler) (NodeCreator) {
-	return jsonSchemaNodeCreator{ context, bundler }
+	return &jsonSchemaNodeCreator{ context, bundler }
 }
 
 type jsonSchemaNodeCreator struct {
@@ -17,7 +17,7 @@ type jsonSchemaNodeCreator struct {
 	bundler JsonSchemaBundler
 }
 
-func (creator jsonSchemaNodeCreator) CreateStructureNode(rootBundle Bundle) (StructureNode, error) {
+func (creator *jsonSchemaNodeCreator) CreateStructureNode(rootBundle Bundle) (StructureNode, error) {
 	rootSchema := rootBundle.Schema
 	if rootSchema.Type != SchemaTypeObject {
 		return StructureNode{}, errors.New("root schema must be object type")
@@ -71,7 +71,7 @@ func (creator jsonSchemaNodeCreator) CreateStructureNode(rootBundle Bundle) (Str
 	}, nil
 }
 
-func (creator jsonSchemaNodeCreator) CreatePropertyNode(name string, bundle Bundle, isRequired bool) (PropertyNode, error) {
+func (creator *jsonSchemaNodeCreator) CreatePropertyNode(name string, bundle Bundle, isRequired bool) (PropertyNode, error) {
 	typeNode, err := creator.CreateTypeNode(bundle, name)
 	if err != nil {
 		return PropertyNode{}, err
@@ -79,7 +79,7 @@ func (creator jsonSchemaNodeCreator) CreatePropertyNode(name string, bundle Bund
 	return PropertyNode{ name, typeNode, isRequired }, nil
 }
 
-func (creator jsonSchemaNodeCreator) CreateTypeNode(bdl Bundle, additionalKey string) (TypeNode, error) {
+func (creator *jsonSchemaNodeCreator) CreateTypeNode(bdl Bundle, additionalKey string) (TypeNode, error) {
 	schema := bdl.Schema
 	if IsPrimitiveSchemaType(schema.Type) {
 		return creator.newSpecifiedTypeNode(schema.Type), nil
@@ -115,15 +115,15 @@ func (creator jsonSchemaNodeCreator) CreateTypeNode(bdl Bundle, additionalKey st
 	}
 }
 
-func (creator jsonSchemaNodeCreator) newSpecifiedTypeNode(typ string) (TypeNode) {
+func (creator *jsonSchemaNodeCreator) newSpecifiedTypeNode(typ string) (TypeNode) {
 	return TypeNode{ typ, nil }
 }
 
-func (creator jsonSchemaNodeCreator) newArrayTypeNode(containType TypeNode) (TypeNode) {
+func (creator *jsonSchemaNodeCreator) newArrayTypeNode(containType TypeNode) (TypeNode) {
 	return TypeNode{ SchemaTypeArray, &containType }
 }
 
-func (creator jsonSchemaNodeCreator) newObjectTypeNode(containType TypeNode) (TypeNode) {
+func (creator *jsonSchemaNodeCreator) newObjectTypeNode(containType TypeNode) (TypeNode) {
 	return TypeNode{ SchemaTypeObject, &containType }
 }
 

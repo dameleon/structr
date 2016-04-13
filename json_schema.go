@@ -52,7 +52,7 @@ type JsonSchema struct {
 	Not []JsonSchema `json:"not"`
 }
 
-func (schema *JsonSchema) GetItemList() ([]JsonSchema) {
+func (schema JsonSchema) GetItemList() ([]JsonSchema) {
 	if schema.Items == nil {
 		return nil
 	}
@@ -69,7 +69,7 @@ func (schema *JsonSchema) GetItemList() ([]JsonSchema) {
 	return res
 }
 
-func (schema *JsonSchema) IsRequired(key string) (bool) {
+func (schema JsonSchema) IsRequired(key string) (bool) {
 	if schema.Required == nil {
 		return false
 	}
