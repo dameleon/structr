@@ -25,6 +25,7 @@ func (creator jsonSchemaNodeCreator) CreateStructureNode(rootBundle bundle) (Str
 	for key, schema := range rootSchema.Properties {
 		var bdl bundle
 		if schema.HasReference() {
+			// if current schema designated reference, specify referred bundle to create property
 			bdl = creator.bundler.GetBundle(rootBundle.GetRelativeJsonReference(schema.Ref))
 		} else {
 			bdl = rootBundle.CreateChild(schema)
@@ -70,7 +71,7 @@ func (creator jsonSchemaNodeCreator) CreateTypeNode(bdl bundle, additionalKey st
 	if IsPrimitiveSchemaType(schema.Type) {
 		return creator.newSpecifiedTypeNode(schema.Type)
 	} else if schema.Type == SchemaTypeArray {
-		// NOTE: not support multiple item types
+		// TODO: not support multiple item types
 		childSchema := schema.GetItemList()[0]
 		var innerBundle bundle
 		if childSchema.HasReference() {
@@ -78,6 +79,7 @@ func (creator jsonSchemaNodeCreator) CreateTypeNode(bdl bundle, additionalKey st
 		} else {
 			innerBundle = bdl.CreateChild(childSchema)
 		}
+		// create inner type recursive
 		return creator.newArrayTypeNode(creator.CreateTypeNode(innerBundle, additionalKey))
 	} else if schema.Type == SchemaTypeObject {
 		var typ string
