@@ -3,9 +3,9 @@ VERSION = $$(git describe --tags --always --dirty) ($$(git name-rev --name-only 
 BUILD_FLAGS = -ldflags "-X main.Version \"$(VERSION)\" "
 
 deps:
-	go get -d
+	go get -d ./...
 testdeps:
-	go get -d -t
+	go get -d -t ./...
 test: testdeps resources
 	go test ./...
 resources:
