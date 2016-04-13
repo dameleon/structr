@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/codegangsta/cli"
 	"os"
-	"path/filepath"
 )
 
 func main() {
@@ -27,20 +26,12 @@ func main() {
 			cli.ShowAppHelp(c)
 			os.Exit(1)
 		}
-		context, err := NewContext(c.String("config"), args[len(args) - 1], c.String("outDir"))
-		if err != nil {
-			panic(err)
-		}
-		files, err := filepath.Glob(context.InputPath)
+		context, err := NewContext(c.String("config"), c.String("outDir"), args)
 		if err != nil {
 			panic(err)
 		}
 		bundler := NewJsonSchemaBundler(NewJsonSchemaLoader())
-		for _, file := range files {
-			if info, _ := os.Stat(file); !info.IsDir() {
-				bundler.AddJsonSchema(file)
-			}
-		}
+		bundler.AddJsonSchema(context.Inputs...)
 		creator := NewJsonSchemaNodeCreator(context, bundler)
 		exporter := NewExporter(context)
 		for _, b := range bundler.GetBundles() {

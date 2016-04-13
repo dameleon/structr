@@ -5,7 +5,7 @@ import (
 )
 
 type JsonSchemaBundler interface {
-	AddJsonSchema(path string)
+	AddJsonSchema(paths ...string)
 	GetBundles() (map[string]Bundle)
 	GetBundle(ref gojsonreference.JsonReference) (Bundle)
 }
@@ -23,14 +23,16 @@ func NewJsonSchemaBundler(loader JsonSchemaLoader) (JsonSchemaBundler) {
 	return b
 }
 
-func (b *bundler) AddJsonSchema(path string) {
-	ref := NewJsonReference(path)
-	bdl := Bundle{ ref, b.loader.Load(ref), false }
-	for _, r := range bdl.Schema.GetRefList() {
-		ref := bdl.GetRelativeJsonReference(r)
-		b.registerNewBundle(Bundle{ ref, b.loader.Load(ref), true })
+func (b *bundler) AddJsonSchema(paths ...string) {
+	for _, path := range paths {
+		ref := NewJsonReference(path)
+		bdl := Bundle{ ref, b.loader.Load(ref), false }
+		for _, r := range bdl.Schema.GetRefList() {
+			ref := bdl.GetRelativeJsonReference(r)
+			b.registerNewBundle(Bundle{ ref, b.loader.Load(ref), true })
+		}
+		b.registerNewBundle(bdl)
 	}
-	b.registerNewBundle(bdl)
 }
 
 func (b *bundler) registerNewBundle(bdl Bundle) {
