@@ -82,7 +82,7 @@ func (creator *jsonSchemaNodeCreator) CreatePropertyNode(name string, bundle Bun
 func (creator *jsonSchemaNodeCreator) CreateTypeNode(bdl Bundle, additionalKey string) (TypeNode, error) {
 	schema := bdl.Schema
 	if IsPrimitiveSchemaType(schema.Type) {
-		return creator.newSpecifiedTypeNode(schema.Type), nil
+		return newSpecifiedTypeNode(schema.Type), nil
 	} else if schema.Type == SchemaTypeArray {
 		// TODO: not support multiple item types
 		childSchema := schema.GetItemList()[0]
@@ -101,7 +101,7 @@ func (creator *jsonSchemaNodeCreator) CreateTypeNode(bdl Bundle, additionalKey s
 		if err != nil {
 			return TypeNode{}, err
 		}
-		return creator.newArrayTypeNode(innerNode), nil
+		return newArrayTypeNode(innerNode), nil
 	} else if schema.Type == SchemaTypeObject {
 		var typ string
 		if bdl.IsReferred {
@@ -109,21 +109,21 @@ func (creator *jsonSchemaNodeCreator) CreateTypeNode(bdl Bundle, additionalKey s
 		} else {
 			typ = additionalKey
 		}
-		return creator.newObjectTypeNode(creator.newSpecifiedTypeNode(typ)), nil
+		return newObjectTypeNode(newSpecifiedTypeNode(typ)), nil
 	} else {
 		panic("undefined type")
 	}
 }
 
-func (creator *jsonSchemaNodeCreator) newSpecifiedTypeNode(typ string) (TypeNode) {
+func newSpecifiedTypeNode(typ string) (TypeNode) {
 	return TypeNode{ typ, nil }
 }
 
-func (creator *jsonSchemaNodeCreator) newArrayTypeNode(containType TypeNode) (TypeNode) {
+func newArrayTypeNode(containType TypeNode) (TypeNode) {
 	return TypeNode{ SchemaTypeArray, &containType }
 }
 
-func (creator *jsonSchemaNodeCreator) newObjectTypeNode(containType TypeNode) (TypeNode) {
+func newObjectTypeNode(containType TypeNode) (TypeNode) {
 	return TypeNode{ SchemaTypeObject, &containType }
 }
 

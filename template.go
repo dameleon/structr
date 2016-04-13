@@ -22,11 +22,11 @@ func NewCommonTemplate(name string, templateString string) (*template.Template) 
 }
 
 func NewContextualTemplate(context Context, name string) (*template.Template) {
-	tmpl := template.Must(template.New(name).Funcs(createFuncMap(context)).Parse(context.Config.StructureTemplate))
+	tmpl := template.Must(template.New(name).Funcs(createContextualFuncMap(context)).Parse(context.Config.StructureTemplate))
 	return tmpl
 }
 
-func createFuncMap(context Context) (template.FuncMap) {
+func createContextualFuncMap(context Context) (template.FuncMap) {
 	var translateTypeName func(typ TypeNode) (string)
 	translateTypeName = func(typ TypeNode) (string) {
 		if tmpl, ok := context.Config.TypeTranslateMap[typ.Name]; ok {
