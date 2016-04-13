@@ -12,8 +12,12 @@ type Bundle struct {
 	IsReferred bool
 }
 
-func (b Bundle) GetRelativeJsonReference(path string) (gojsonreference.JsonReference) {
-	return NewRelativeJsonReference(b.Ref, NewJsonReference(path))
+func (b Bundle) GetRelativeJsonReference(path string) (gojsonreference.JsonReference, error) {
+	ref, err := gojsonreference.NewJsonReference(path)
+	if err != nil {
+		return ref, err
+	}
+	return NewRelativeJsonReference(b.Ref, ref)
 }
 
 func (b Bundle) GetName() (string) {

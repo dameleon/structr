@@ -2,21 +2,12 @@ package main
 
 import (
 	"github.com/xeipuuv/gojsonreference"
-	"log"
 )
 
-func NewJsonReference(path string) (gojsonreference.JsonReference) {
-	ref, err := gojsonreference.NewJsonReference(path)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return ref
-}
-
-func NewRelativeJsonReference(base gojsonreference.JsonReference, ref gojsonreference.JsonReference) (gojsonreference.JsonReference) {
+func NewRelativeJsonReference(base gojsonreference.JsonReference, ref gojsonreference.JsonReference) (gojsonreference.JsonReference, error) {
 	if ref.IsCanonical() {
-		return ref
+		return ref, nil
 	}
-	return NewJsonReference(base.GetUrl().ResolveReference(ref.GetUrl()).String())
+	return gojsonreference.NewJsonReference(base.GetUrl().ResolveReference(ref.GetUrl()).String())
 }
 

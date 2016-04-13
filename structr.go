@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/codegangsta/cli"
 	"os"
+	"log"
 )
 
 func main() {
@@ -28,14 +29,22 @@ func main() {
 		}
 		context, err := NewContext(c.String("config"), c.String("outDir"), args)
 		if err != nil {
-			panic(err)
+			log.Fatalln("initialize error: ", err.Error())
 		}
 		bundler := NewJsonSchemaBundler(NewJsonSchemaLoader())
-		bundler.AddJsonSchema(context.Inputs...)
+		if err := bundler.AddJsonSchema(context.Inputs...); err != nil {
+			log.Fatalln("cannot add load json schema: ", err.Error())
+		}
 		creator := NewJsonSchemaNodeCreator(context, bundler)
 		exporter := NewExporter(context)
 		for _, b := range bundler.GetBundles() {
-			exporter.Export(creator.CreateStructureNode(b))
+			structure, err := creator.CreateStructureNode(b)
+			if err != nil {
+				log.Fatalln("cannot create structure node: ", err.Error())
+			}
+			if err := exporter.Export(structure); err != nil {
+				log.Fatalln("cannot export structure node: ", err.Error())
+			}
 		}
 	}
 	app.Run(os.Args)
