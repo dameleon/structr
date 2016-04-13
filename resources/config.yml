@@ -1,3 +1,6 @@
+## structr configulation file
+
+# Definitions for translating each type of JSONSchema.
 type_translate_map:
   string: "String"
   integer: "Int"
@@ -6,8 +9,14 @@ type_translate_map:
   null: "nil"
   array: "[{{.InnerType}}]"
   object: "{{.InnerType}}"
+
+# If execute structr with "outDir" option, structr outputs file(s) with the definition of "output_filename" template.
 output_filename: "{{.Name}}.swift"
+
+# To output the structure of JSONSchema in dependency(a.k.a specified of "$ref" key in JSONSchema).
 output_dependencies: true
+
+# Templates for output the structure
 structure_template: |
   struct {{.Name}}: Mappable {
   {{range .Properties}}
