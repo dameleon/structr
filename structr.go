@@ -35,10 +35,6 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		type structureHolder struct {
-			main []StructureNode
-			dependencies map[string]StructureNode
-		}
 		bundler := NewJsonSchemaBundler(NewJsonSchemaLoader())
 		for _, file := range files {
 			if info, _ := os.Stat(file); !info.IsDir() {
@@ -46,9 +42,9 @@ func main() {
 			}
 		}
 		creator := NewJsonSchemaNodeCreator(context, bundler)
+		exporter := NewExporter(context)
 		for _, b := range bundler.GetBundles() {
-			tmpl := NewContextualTemplate(context, b.GetName())
-			tmpl.Execute(os.Stdout, creator.CreateStructureNode(b))
+			exporter.Export(creator.CreateStructureNode(b))
 		}
 	}
 	app.Run(os.Args)
