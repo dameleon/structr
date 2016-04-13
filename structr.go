@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/codegangsta/cli"
+	_ "github.com/jteeuwen/go-bindata"
 	"os"
 )
 
