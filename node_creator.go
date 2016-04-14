@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"github.com/k0kubun/pp"
+	"fmt"
 )
 
 type NodeCreator interface {
@@ -24,7 +25,7 @@ func (creator *jsonSchemaNodeCreator) CreateStructureNode(name string, rootBundl
 	rootSchema := rootBundle.Schema
 	if rootSchema.Type != JsonSchemaTypeObject {
 		pp.Print(rootSchema)
-		return StructureNode{}, errors.New("root schema must be object type. TYPE: " + rootSchema.Type.String())
+		return StructureNode{}, errors.New(fmt.Errorf("root schema must be object type. TYPE: %s", rootSchema.Type.String()))
 	}
 	node := StructureNode{
 		name,
