@@ -1,30 +1,36 @@
 package main
 
+type JsonSchemaType string
+
 const (
-	SchemaTypeNull = "null"
-	SchemaTypeBoolean = "boolean"
-	SchemaTypeString = "string"
-	SchemaTypeInteger = "integer"
-	SchemaTypeNumber = "number"
-	SchemaTypeObject = "object"
-	SchemaTypeArray = "array"
+	JsonSchemaTypeNull JsonSchemaType = "null"
+	JsonSchemaTypeBoolean = "boolean"
+	JsonSchemaTypeString = "string"
+	JsonSchemaTypeInteger = "integer"
+	JsonSchemaTypeNumber = "number"
+	JsonSchemaTypeObject = "object"
+	JsonSchemaTypeArray = "array"
 )
 
-var SchemaTypes = [...]string{
-	SchemaTypeNull,
-	SchemaTypeBoolean,
-	SchemaTypeString,
-	SchemaTypeInteger,
-	SchemaTypeNumber,
-	SchemaTypeObject,
-	SchemaTypeArray,
+var JsonSchemaTypes = [...]JsonSchemaType{
+	JsonSchemaTypeNull,
+	JsonSchemaTypeBoolean,
+	JsonSchemaTypeString,
+	JsonSchemaTypeInteger,
+	JsonSchemaTypeNumber,
+	JsonSchemaTypeObject,
+	JsonSchemaTypeArray,
 }
 
-func IsPrimitiveSchemaType(target string) (bool) {
-	switch target {
-	case SchemaTypeNull, SchemaTypeBoolean, SchemaTypeString, SchemaTypeInteger, SchemaTypeNumber:
+func (t JsonSchemaType) IsPrimitiveSchemaType() (bool) {
+	switch t {
+	case JsonSchemaTypeNull, JsonSchemaTypeBoolean, JsonSchemaTypeString, JsonSchemaTypeInteger, JsonSchemaTypeNumber:
 		return true
 	}
 	return false
+}
+
+func (t JsonSchemaType) String() (string) {
+	return string(t)
 }
 

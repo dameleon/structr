@@ -9,7 +9,7 @@ import (
 
 type JsonSchema struct {
 	Schema string `json:"$schema"`
-	Type string `json:"type"`
+	Type JsonSchemaType `json:"type"`
 	Id string `json:"id"`
 	Title string `json:"title"`
 	Description string `json:"description"`
@@ -99,11 +99,11 @@ func (schema JsonSchema) GetRefSchema(pointer *gojsonpointer.JsonPointer) (JsonS
 func (schema JsonSchema) GetRefList() ([]string) {
 	res := []string{}
 	switch schema.Type {
-	case SchemaTypeObject:
+	case JsonSchemaTypeObject:
 		for _, s := range schema.Properties {
 			res = append(res, s.GetRefList()...)
 		}
-	case SchemaTypeArray:
+	case JsonSchemaTypeArray:
 		for _, s := range schema.GetItemList() {
 			res = append(res, s.GetRefList()...)
 		}

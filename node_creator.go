@@ -19,7 +19,7 @@ type jsonSchemaNodeCreator struct {
 
 func (creator *jsonSchemaNodeCreator) CreateStructureNode(rootBundle Bundle) (StructureNode, error) {
 	rootSchema := rootBundle.Schema
-	if rootSchema.Type != SchemaTypeObject {
+	if rootSchema.Type != JsonSchemaTypeObject {
 		return StructureNode{}, errors.New("root schema must be object type")
 	}
 	properties := []PropertyNode{}
@@ -46,10 +46,11 @@ func (creator *jsonSchemaNodeCreator) CreateStructureNode(rootBundle Bundle) (St
 		if innerType := prop.Type.InnerType; innerType != nil && !bdl.IsReferred {
 			name := innerType.EntityName()
 			schema := schema
-			if schema.Type == SchemaTypeArray {
+			switch schema.Type {
+			case JsonSchemaTypeArray:
 				schema = schema.GetItemList()[0]
-			}
-			if schema.Type == SchemaTypeObject {
+				fallthrough
+			case JsonSchemaTypeObject:
 				if _, ok := childrenMap[name]; !ok {
 					child, err := creator.CreateStructureNode(bdl.CreateChild(schema))
 					if err != nil {
@@ -81,9 +82,10 @@ func (creator *jsonSchemaNodeCreator) CreatePropertyNode(name string, bundle Bun
 
 func (creator *jsonSchemaNodeCreator) CreateTypeNode(bdl Bundle, additionalKey string) (TypeNode, error) {
 	schema := bdl.Schema
-	if IsPrimitiveSchemaType(schema.Type) {
-		return newSpecifiedTypeNode(schema.Type), nil
-	} else if schema.Type == SchemaTypeArray {
+	switch {
+	case schema.Type.IsPrimitiveSchemaType():
+		return newSpecifiedTypeNode(schema.Type.String()), nil
+	case schema.Type == JsonSchemaTypeArray:
 		// TODO: not support multiple item types
 		childSchema := schema.GetItemList()[0]
 		var innerBundle Bundle
@@ -102,7 +104,7 @@ func (creator *jsonSchemaNodeCreator) CreateTypeNode(bdl Bundle, additionalKey s
 			return TypeNode{}, err
 		}
 		return newArrayTypeNode(innerNode), nil
-	} else if schema.Type == SchemaTypeObject {
+	case schema.Type == JsonSchemaTypeObject:
 		var typ string
 		if bdl.IsReferred {
 			typ = bdl.GetName()
@@ -110,7 +112,7 @@ func (creator *jsonSchemaNodeCreator) CreateTypeNode(bdl Bundle, additionalKey s
 			typ = additionalKey
 		}
 		return newObjectTypeNode(newSpecifiedTypeNode(typ)), nil
-	} else {
+	default:
 		panic("undefined type")
 	}
 }
@@ -120,10 +122,10 @@ func newSpecifiedTypeNode(typ string) (TypeNode) {
 }
 
 func newArrayTypeNode(containType TypeNode) (TypeNode) {
-	return TypeNode{ SchemaTypeArray, &containType }
+	return TypeNode{ JsonSchemaTypeArray, &containType }
 }
 
 func newObjectTypeNode(containType TypeNode) (TypeNode) {
-	return TypeNode{ SchemaTypeObject, &containType }
+	return TypeNode{ JsonSchemaTypeObject, &containType }
 }
 
