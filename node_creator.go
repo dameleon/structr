@@ -1,8 +1,6 @@
 package main
 
 import (
-	"errors"
-	"github.com/k0kubun/pp"
 	"fmt"
 )
 
@@ -24,8 +22,7 @@ type jsonSchemaNodeCreator struct {
 func (creator *jsonSchemaNodeCreator) CreateStructureNode(name string, rootBundle Bundle) (StructureNode, error) {
 	rootSchema := rootBundle.Schema
 	if rootSchema.Type != JsonSchemaTypeObject {
-		pp.Print(rootSchema)
-		return StructureNode{}, errors.New(fmt.Errorf("root schema must be object type. TYPE: %s", rootSchema.Type.String()))
+		return StructureNode{}, fmt.Errorf("root schema must be object type. TYPE: %s", rootSchema.Type.String())
 	}
 	node := StructureNode{
 		name,
