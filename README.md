@@ -5,9 +5,15 @@
 ## Installation
 
 ```shell
-
 $ go get github.com/dameleon/structr
+```
 
+## Synopsis
+
+```
+structr generate -c ${YOUR_CONFIGURATION_YAML_FILE} ${INPUT_FILE_PATH}...
+structr template
+structr help
 ```
 
 ## Usage
@@ -17,7 +23,6 @@ $ go get github.com/dameleon/structr
 For example, translating JSONSchema type to swift type.
 
 ```yaml
-
 ## structr configulation file
 
 # Definitions for translating each type of JSONSchema.
@@ -38,28 +43,26 @@ output_dependencies: true
 
 # Templates for output the structure
 structure_template: |
-  struct {{.Name}} {
+  struct {{.Name|toUpperCamelCase}} {
   {{range .Properties}}
-      var {{.Name}}: {{.Type|translateTypeName}}?
-  {{end}}
+      var {{.Name}}: {{.Type|translateTypeName|toUpperCamelCase}}?{{end}}
 
   {{.Children|extractStructures}}
   }
 
+# If the structure has children, to specify strings to nest structure of children
+child_structures_nesting: "    "
 ```
 
 Also, you can get configulation file template following command
 
 ```shell
-
-$ structr template > ${YOUR_CONFIGURATION_YAML_FILE} 
-
+$ structr template > ${YOUR_CONFIGURATION_YAML_FILE}
 ```
 
 ### 2. Generate structure definition(s)
 
 ```shell
-
 # output with stdout
 $ structr generate -c ${YOUR_CONFIGURATION_YAML_FILE} ${INPUT_FILE_PATH}
 
@@ -93,8 +96,57 @@ $ tree ${OUTPUT_DIR_PATH}
 OUTPUT_DIR_PATH
 ├── YourStruct.swift
 └── YourDependencyStruct.swift
-
 ```
+
+## NOTE
+
+### configure template
+
+#### passed datas
+
+##### In "type_translate_map" each values
+
+```golang
+struct {
+    .Type string
+    .InnerType string
+}
+```
+
+
+##### In "output_filename" and "structure_template"
+
+`StructureNode`
+
+for more details, see [nodes.go](./blob/master/nodes.go)
+
+
+#### helpers
+
+##### for "type_translate_map", "output_filename", "structure_template"
+
+- `toUpperCamelCase` : returns upper camelized string
+    - `{"foo-bar-baz" | toUpperCamelCase} -> "FooBarBaz"`
+    - `{"foo bar baz" | toUpperCamelCase} -> "FooBarBaz"`
+    - `{"fooBarBaz" | toUpperCamelCase} -> "FooBarBaz"`
+- `toLowerCamelCase` : returns lower camelized string
+    - `{"foo-bar-baz" | toLowerCamelCase} -> "fooBarBaz"`
+    - `{"foo bar baz" | toLowerCamelCase} -> "fooBarBaz"`
+    - `{"fooBarBaz" | toLowerCamelCase} -> "fooBarBaz"`
+
+##### for "structure_template"
+
+- `translateTypeName` : returns translated string of `TypeNode`
+    - ex: `{"type_translate_map": { "string": "TypedString" }}`
+        - `{TypeNode{ Name: "string" } | translateTypeName} -> "TypedString"`
+    - ex: `{"type_translate_map": { "string": "TypedString", "array": "[]{{.InnerType}}" }}`
+        - `{TypeNode{ Name: "array", InnerType: "string" } | translateTypeName} -> "[]TypedString"`
+- `extractStructures` : returns extracted StructureNodes(for StructureNode.Children)
+
+
+## Author
+
+[dameleon](https://twitter.com/damele0n)<dameleon[at]gmail.com>
 
 ## LICENSE
 
