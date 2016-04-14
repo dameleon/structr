@@ -151,3 +151,16 @@ for more details, see [nodes.go](./blob/master/nodes.go)
 ## LICENSE
 
 The MIT License (MIT)
+
+
+## Acknowledgement
+
+- [github.com/codegangsta/cli](https://github.com/codegangsta/cli)
+- [github.com/jteeuwen/go-bindata](https://github.com/jteeuwen/go-bindata)
+- [github.com/xeipuuv/gojsonpointer](https://github.com/xeipuuv/gojsonpointer)
+- [github.com/xeipuuv/gojsonreference](https://github.com/xeipuuv/gojsonreference)
+- [gopkg.in/yaml.v2](https://gopkg.in/yaml.v2)
+
+### for debug
+
+- [github.com/k0kubun/pp](https://github.com/k0kubun/pp)
