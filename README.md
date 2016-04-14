@@ -161,6 +161,6 @@ The MIT License (MIT)
 - [github.com/xeipuuv/gojsonreference](https://github.com/xeipuuv/gojsonreference)
 - [gopkg.in/yaml.v2](https://gopkg.in/yaml.v2)
 
-### for debug
+### for development
 
 - [github.com/k0kubun/pp](https://github.com/k0kubun/pp)
