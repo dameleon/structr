@@ -23,8 +23,12 @@ type stdoutExporter struct {
 }
 
 func (e *stdoutExporter) Export(node StructureNode) (error) {
-	tmpl := NewContextualTemplate(e.context, node.Name)
-	if err := tmpl.Execute(os.Stdout, node); err != nil {
+	conf := e.context.Config
+	generator, err := NewStructGenerator(conf.StructureTemplate, conf.TypeTranslateMap)
+	if err != nil {
+		return err
+	}
+	if err := generator.Generate(os.Stdout, node); err != nil {
 		return err
 	}
 	return nil
@@ -35,16 +39,23 @@ type fileExporter struct {
 }
 
 func (e *fileExporter) Export(node StructureNode) (error) {
-	tmpl := NewContextualTemplate(e.context, node.Name)
+	conf := e.context.Config
+	generator, err := NewStructGenerator(conf.StructureTemplate, conf.TypeTranslateMap)
+	if err != nil {
+		return err
+	}
 	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, node); err != nil {
+	if err := generator.Generate(&buf, node); err != nil {
 		return err
 	}
 	if err := e.mkdirIfNeeded(); err != nil {
 		return err
 	}
-	ioutil.WriteFile(filepath.Join(e.context.OutputDirPath, e.getFileName(node)), buf.Bytes(), os.ModePerm)
-	return nil
+	filename, err := e.getFileName(node)
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(filepath.Join(e.context.OutputDirPath, filename), buf.Bytes(), os.ModePerm)
 }
 
 func (e *fileExporter) mkdirIfNeeded() (error) {
@@ -59,11 +70,14 @@ func (e *fileExporter) mkdirIfNeeded() (error) {
 
 }
 
-func (e *fileExporter) getFileName(node StructureNode) (string) {
-	tmpl := NewCommonTemplate(node.Name, e.context.Config.OutputFilename)
+func (e *fileExporter) getFileName(node StructureNode) (string, error) {
+	tmpl, err := NewTemplate(node.Name).Parse(e.context.Config.OutputFilename)
+	if err != nil {
+		return "", err
+	}
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, node); err != nil {
-		panic(err)
+		return "", err
 	}
-	return buf.String()
+	return buf.String(), nil
 }

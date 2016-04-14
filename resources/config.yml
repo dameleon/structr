@@ -18,10 +18,9 @@ output_dependencies: true
 
 # Templates for output the structure
 structure_template: |
-  struct {{.Name}} {
+  struct {{.Name|toUpperCamelCase}} {
   {{range .Properties}}
-      var {{.Name}}: {{.Type|translateTypeName}}?
+      var {{.Name}}: {{.Type|translateTypeName|toUpperCamelCase}}?
   {{end}}
-
   {{.Children|extractStructures}}
   }

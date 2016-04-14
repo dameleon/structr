@@ -5,57 +5,75 @@ import (
 	"strings"
 	"regexp"
 	"bytes"
+	"io"
 )
-
-type TypeData struct {
-	Type string
-	InnerType string
-}
 
 var commonFuncMap = template.FuncMap{
 	"toUpperCamelCase": toUpperCamelCase,
 	"toLowerCamelCase": toLowerCamelCase,
 }
 
-func NewCommonTemplate(name string, templateString string) (*template.Template) {
-	return template.Must(template.New(name).Funcs(commonFuncMap).Parse(templateString))
+func NewTemplate(name string) (*template.Template) {
+	return template.New(name).Funcs(commonFuncMap)
 }
 
-func NewContextualTemplate(context Context, name string) (*template.Template) {
-	tmpl := template.Must(template.New(name).Funcs(createContextualFuncMap(context)).Parse(context.Config.StructureTemplate))
-	return tmpl
+type StructGenerator interface {
+	Generate(wr io.Writer, node StructureNode) (error)
 }
 
-func createContextualFuncMap(context Context) (template.FuncMap) {
-	var translateTypeName func(typ TypeNode) (string)
-	translateTypeName = func(typ TypeNode) (string) {
-		if tmpl, ok := context.Config.TypeTranslateMap[typ.Name]; ok {
-			var inner string
-			if typ.InnerType != nil {
-				inner = translateTypeName(*typ.InnerType)
-			}
-			t := NewCommonTemplate(typ.Name, tmpl)
-			var res bytes.Buffer
-			t.Execute(&res, TypeData{ typ.Name, inner })
-			return res.String()
-		}
-		return typ.Name
+func NewStructGenerator(templateString string, typeTranslateMap map[string]string) (StructGenerator, error) {
+	g := &structGenerator{ typeTranslateMap, nil }
+	var err error
+	g.template, err = NewTemplate("StructTemplate").Funcs(template.FuncMap{
+		"translateTypeName": g.translateTypeName,
+		"extractStructures": g.extractStructures,
+	}).Parse(templateString)
+	if err != nil {
+		return nil, err
 	}
-	var extractStructures = func(structures []StructureNode) (string) {
+	return g, nil
+}
+
+type structGenerator struct {
+	typeTranslateMap map[string]string
+	template *template.Template
+}
+
+func (g *structGenerator) Generate(wr io.Writer, node StructureNode) (error) {
+	return g.template.Execute(wr, node)
+}
+
+func (g *structGenerator) extractStructures(nodes []StructureNode) (string) {
+	res := []string{}
+	for _, node := range nodes {
+		var buf bytes.Buffer
+		err := g.Generate(&buf, node)
+		if err != nil {
+			panic(err)
+		}
+		res = append(res, buf.String())
+	}
+	return strings.Join(res, "")
+}
+
+func (g *structGenerator) translateTypeName(typ TypeNode) (string) {
+	if tmpl, ok := g.typeTranslateMap[typ.Name]; ok {
+		var data = struct {
+			Type string
+			InnerType string
+		}{ typ.Name, "" }
+		if typ.InnerType != nil {
+			data.InnerType = g.translateTypeName(*typ.InnerType)
+		}
+		t := template.Must(NewTemplate(typ.Name).Parse(tmpl))
 		var res bytes.Buffer
-		for _, node := range structures {
-			tmpl := NewContextualTemplate(context, node.Name)
-			tmpl.Execute(&res, node)
+		err := t.Execute(&res, data)
+		if err != nil {
+			panic(err)
 		}
 		return res.String()
 	}
-
-	return template.FuncMap{
-		"toUpperCamelCase": toUpperCamelCase,
-		"toLowerCamelCase": toLowerCamelCase,
-		"translateTypeName": translateTypeName,
-		"extractStructures": extractStructures,
-	}
+	return typ.Name
 }
 
 /// helpers
