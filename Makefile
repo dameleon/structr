@@ -1,6 +1,6 @@
 VERSION = $$(git describe --tags --always --dirty) ($$(git name-rev --name-only HEAD))
 
-BUILD_FLAGS = -ldflags "-X main.Version \"$(VERSION)\" "
+BUILD_FLAGS = -ldflags "-s -w -X \"main.Version=$(VERSION)\" "
 
 resources:
 	go get -u github.com/jteeuwen/go-bindata/...
