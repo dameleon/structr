@@ -118,7 +118,7 @@ struct {
 
 `StructureNode`
 
-for more details, see [nodes.go](./blob/master/nodes.go)
+for more details, see [nodes.go](https://github.com/dameleon/structr/blob/master/nodes.go)
 
 
 #### helpers
@@ -146,7 +146,7 @@ for more details, see [nodes.go](./blob/master/nodes.go)
 
 ## Author
 
-[dameleon](https://twitter.com/damele0n)<dameleon[at]gmail.com>
+[dameleon](https://twitter.com/damele0n) dameleon[at]gmail.com
 
 ## LICENSE
 
