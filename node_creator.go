@@ -6,7 +6,7 @@ import (
 )
 
 type NodeCreator interface {
-	CreateStructureNode(bundle Bundle) (StructureNode, error)
+	CreateStructureNode(name string, bundle Bundle) (StructureNode, error)
 	CreatePropertyNode(name string, bundle Bundle, isRequired bool) (PropertyNode, error)
 	CreateTypeNode(bundle Bundle, additionalKey string) (TypeNode, error)
 }
@@ -20,14 +20,14 @@ type jsonSchemaNodeCreator struct {
 	bundler JsonSchemaBundler
 }
 
-func (creator *jsonSchemaNodeCreator) CreateStructureNode(rootBundle Bundle) (StructureNode, error) {
+func (creator *jsonSchemaNodeCreator) CreateStructureNode(name string, rootBundle Bundle) (StructureNode, error) {
 	rootSchema := rootBundle.Schema
 	if rootSchema.Type != JsonSchemaTypeObject {
 		pp.Print(rootSchema)
 		return StructureNode{}, errors.New("root schema must be object type. TYPE: " + rootSchema.Type.String())
 	}
 	node := StructureNode{
-		rootBundle.GetName(),
+		name,
 		[]PropertyNode{},
 		[]StructureNode{},
 		nil,
@@ -60,7 +60,7 @@ func (creator *jsonSchemaNodeCreator) CreateStructureNode(rootBundle Bundle) (St
 			}
 			if schema.Type == JsonSchemaTypeObject {
 				if _, ok := childrenMap[name]; !ok {
-					child, err := creator.CreateStructureNode(bdl.CreateChild(schema))
+					child, err := creator.CreateStructureNode(name, bdl.CreateChild(schema))
 					if err != nil {
 						return StructureNode{}, err
 					}
