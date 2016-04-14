@@ -1,10 +1,10 @@
 package main
 
 import (
-	"text/template"
-	"strings"
-	"regexp"
 	"bytes"
+	"regexp"
+	"strings"
+	"text/template"
 )
 
 var commonFuncMap = template.FuncMap{
@@ -12,7 +12,7 @@ var commonFuncMap = template.FuncMap{
 	"toLowerCamelCase": toLowerCamelCase,
 }
 
-func NewTemplate(name string) (*template.Template) {
+func NewTemplate(name string) *template.Template {
 	return template.New(name).Funcs(commonFuncMap)
 }
 
@@ -21,7 +21,7 @@ type StructGenerator interface {
 }
 
 func NewStructGenerator(templateString string, nesting string, typeTranslateMap map[string]string) (StructGenerator, error) {
-	g := &structGenerator{ typeTranslateMap, nesting, nil }
+	g := &structGenerator{typeTranslateMap, nesting, nil}
 	var err error
 	g.template, err = NewTemplate("StructTemplate").Funcs(template.FuncMap{
 		"translateTypeName": g.translateTypeName,
@@ -35,8 +35,8 @@ func NewStructGenerator(templateString string, nesting string, typeTranslateMap 
 
 type structGenerator struct {
 	typeTranslateMap map[string]string
-	nesting string
-	template *template.Template
+	nesting          string
+	template         *template.Template
 }
 
 func (g *structGenerator) Generate(node StructureNode) (string, error) {
@@ -51,10 +51,10 @@ func (g *structGenerator) Generate(node StructureNode) (string, error) {
 		return "", err
 	}
 	re := regexp.MustCompile(`(.*(\r\n|\n)?)`)
-	return re.ReplaceAllString(buf.String(), nest + "$1"), nil
+	return re.ReplaceAllString(buf.String(), nest+"$1"), nil
 }
 
-func (g *structGenerator) extractStructures(nodes []StructureNode) (string) {
+func (g *structGenerator) extractStructures(nodes []StructureNode) string {
 	res := []string{}
 	for _, node := range nodes {
 		str, err := g.Generate(node)
@@ -66,12 +66,12 @@ func (g *structGenerator) extractStructures(nodes []StructureNode) (string) {
 	return strings.Join(res, "")
 }
 
-func (g *structGenerator) translateTypeName(typ TypeNode) (string) {
+func (g *structGenerator) translateTypeName(typ TypeNode) string {
 	if tmpl, ok := g.typeTranslateMap[typ.Name]; ok {
 		var data = struct {
-			Type string
+			Type      string
 			InnerType string
-		}{ typ.Name, "" }
+		}{typ.Name, ""}
 		if typ.InnerType != nil {
 			data.InnerType = g.translateTypeName(*typ.InnerType)
 		}
@@ -87,17 +87,17 @@ func (g *structGenerator) translateTypeName(typ TypeNode) (string) {
 }
 
 /// helpers
-func toUpperCamelCase(str string) (string) {
+func toUpperCamelCase(str string) string {
 	return strings.Replace(strings.Title(replaceSnakeBodyToSpace(str)), " ", "", -1)
 }
 
-func toLowerCamelCase(str string) (string) {
+func toLowerCamelCase(str string) string {
 	s := toUpperCamelCase(str)
 	f := string(s[0])
 	return strings.Replace(s, f, strings.ToLower(f), 1)
 }
 
-func replaceSnakeBodyToSpace(str string) (string) {
+func replaceSnakeBodyToSpace(str string) string {
 	r := regexp.MustCompile(`[_-]`)
 	return r.ReplaceAllString(str, " ")
 }

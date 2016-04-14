@@ -1,17 +1,17 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/xeipuuv/gojsonreference"
 	"io/ioutil"
-	"encoding/json"
 )
 
 type JsonSchemaLoader interface {
 	Load(ref gojsonreference.JsonReference) (JsonSchema, error)
 }
 
-func NewJsonSchemaLoader() (JsonSchemaLoader) {
-	return &jsonSchemaLoader{ make(map[string]JsonSchema) }
+func NewJsonSchemaLoader() JsonSchemaLoader {
+	return &jsonSchemaLoader{make(map[string]JsonSchema)}
 }
 
 type jsonSchemaLoader struct {

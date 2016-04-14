@@ -3,13 +3,13 @@ package main
 type JsonSchemaType string
 
 const (
-	JsonSchemaTypeNull JsonSchemaType = "null"
-	JsonSchemaTypeBoolean = "boolean"
-	JsonSchemaTypeString = "string"
-	JsonSchemaTypeInteger = "integer"
-	JsonSchemaTypeNumber = "number"
-	JsonSchemaTypeObject = "object"
-	JsonSchemaTypeArray = "array"
+	JsonSchemaTypeNull    JsonSchemaType = "null"
+	JsonSchemaTypeBoolean                = "boolean"
+	JsonSchemaTypeString                 = "string"
+	JsonSchemaTypeInteger                = "integer"
+	JsonSchemaTypeNumber                 = "number"
+	JsonSchemaTypeObject                 = "object"
+	JsonSchemaTypeArray                  = "array"
 )
 
 var JsonSchemaTypes = [...]JsonSchemaType{
@@ -22,7 +22,7 @@ var JsonSchemaTypes = [...]JsonSchemaType{
 	JsonSchemaTypeArray,
 }
 
-func (t JsonSchemaType) IsPrimitiveSchemaType() (bool) {
+func (t JsonSchemaType) IsPrimitiveSchemaType() bool {
 	switch t {
 	case JsonSchemaTypeNull, JsonSchemaTypeBoolean, JsonSchemaTypeString, JsonSchemaTypeInteger, JsonSchemaTypeNumber:
 		return true
@@ -30,7 +30,6 @@ func (t JsonSchemaType) IsPrimitiveSchemaType() (bool) {
 	return false
 }
 
-func (t JsonSchemaType) String() (string) {
+func (t JsonSchemaType) String() string {
 	return string(t)
 }
-

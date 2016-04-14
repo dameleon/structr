@@ -20,7 +20,7 @@ func (b Bundle) GetRelativeJsonReference(path string) (gojsonreference.JsonRefer
 	return NewRelativeJsonReference(b.Ref, ref)
 }
 
-func (b Bundle) GetName() (string) {
+func (b Bundle) GetName() string {
 	if b.Schema.Id != "" {
 		return b.Schema.Id
 	}
@@ -28,6 +28,6 @@ func (b Bundle) GetName() (string) {
 	return strings.Replace(basename, filepath.Ext(basename), "", 1)
 }
 
-func (b Bundle) CreateChild(schema JsonSchema) (Bundle) {
-	return Bundle{ b.Ref, schema, b.IsReferred }
+func (b Bundle) CreateChild(schema JsonSchema) Bundle {
+	return Bundle{b.Ref, schema, b.IsReferred}
 }

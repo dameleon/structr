@@ -5,17 +5,17 @@ import (
 )
 
 type JsonSchemaBundler interface {
-	AddJsonSchema(paths ...string) (error)
-	GetBundles() (map[string]Bundle)
-	GetBundle(ref gojsonreference.JsonReference) (Bundle)
+	AddJsonSchema(paths ...string) error
+	GetBundles() map[string]Bundle
+	GetBundle(ref gojsonreference.JsonReference) Bundle
 }
 
 type bundler struct {
-	loader JsonSchemaLoader
+	loader  JsonSchemaLoader
 	bundles map[string]Bundle
 }
 
-func NewJsonSchemaBundler(loader JsonSchemaLoader) (JsonSchemaBundler) {
+func NewJsonSchemaBundler(loader JsonSchemaLoader) JsonSchemaBundler {
 	b := &bundler{
 		loader,
 		make(map[string]Bundle),
@@ -23,7 +23,7 @@ func NewJsonSchemaBundler(loader JsonSchemaLoader) (JsonSchemaBundler) {
 	return b
 }
 
-func (b *bundler) AddJsonSchema(paths ...string) (error) {
+func (b *bundler) AddJsonSchema(paths ...string) error {
 	for _, path := range paths {
 		ref, err := gojsonreference.NewJsonReference(path)
 		if err != nil {
@@ -33,7 +33,7 @@ func (b *bundler) AddJsonSchema(paths ...string) (error) {
 		if err != nil {
 			return err
 		}
-		bdl := Bundle{ ref, schema, false }
+		bdl := Bundle{ref, schema, false}
 		for _, r := range bdl.Schema.GetRefList() {
 			ref, err := bdl.GetRelativeJsonReference(r)
 			if err != nil {
@@ -43,7 +43,7 @@ func (b *bundler) AddJsonSchema(paths ...string) (error) {
 			if err != nil {
 				return err
 			}
-			b.registerNewBundle(Bundle{ ref, schema, true })
+			b.registerNewBundle(Bundle{ref, schema, true})
 		}
 		b.registerNewBundle(bdl)
 	}
@@ -57,11 +57,11 @@ func (b *bundler) registerNewBundle(bdl Bundle) {
 	b.bundles[bdl.Ref.String()] = bdl
 }
 
-func (b *bundler) GetBundles() (map[string]Bundle) {
+func (b *bundler) GetBundles() map[string]Bundle {
 	return b.bundles
 }
 
-func (b *bundler) GetBundle(ref gojsonreference.JsonReference) (Bundle) {
+func (b *bundler) GetBundle(ref gojsonreference.JsonReference) Bundle {
 	if bdl, ok := b.bundles[ref.String()]; ok {
 		return bdl
 	}

@@ -1,16 +1,16 @@
 package main
 
 import (
-	"io/ioutil"
 	"gopkg.in/yaml.v2"
+	"io/ioutil"
 )
 
 type Config struct {
 	TypeTranslateMap       map[string]string `yaml:"type_translate_map"`
-	OutputFilename         string `yaml:"output_filename"`
-	OutputDependencies     bool `yaml:"output_dependencies"`
-	StructureTemplate      string `yaml:"structure_template"`
-	ChildStructuresNesting string `yaml:"child_structures_nesting"`
+	OutputFilename         string            `yaml:"output_filename"`
+	OutputDependencies     bool              `yaml:"output_dependencies"`
+	StructureTemplate      string            `yaml:"structure_template"`
+	ChildStructuresNesting string            `yaml:"child_structures_nesting"`
 }
 
 func NewConfig(filepath string) (Config, error) {

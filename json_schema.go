@@ -2,57 +2,57 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/xeipuuv/gojsonpointer"
 	"reflect"
 	"strings"
-	"github.com/xeipuuv/gojsonpointer"
 )
 
 type JsonSchema struct {
-	Schema string `json:"$schema"`
-	Type JsonSchemaType `json:"type"`
-	Id string `json:"id"`
-	Title string `json:"title"`
-	Description string `json:"description"`
-	Default interface{} `json:"default"`
-	Enum []interface{} `json:"enum"`
+	Schema      string                `json:"$schema"`
+	Type        JsonSchemaType        `json:"type"`
+	Id          string                `json:"id"`
+	Title       string                `json:"title"`
+	Description string                `json:"description"`
+	Default     interface{}           `json:"default"`
+	Enum        []interface{}         `json:"enum"`
 	Definitions map[string]JsonSchema `json:"definitions"`
-	Ref string `json:"$ref"`
+	Ref         string                `json:"$ref"`
 
 	// string
 	MinLength json.Number `json:"minLength"`
 	MaxLength json.Number `json:"maxLength"`
-	Pattern string `json:"pattern"`
-	Format string `json:"format"`
+	Pattern   string      `json:"pattern"`
+	Format    string      `json:"format"`
 
 	// numeric
-	MultipleOf json.Number `json:"multipleOf"`
-	Minimum json.Number `json:"minimum"`
-	Maximum json.Number `json:"maximum"`
-	ExclusiveMaximum bool `json:"exclusiveMaximum"`
+	MultipleOf       json.Number `json:"multipleOf"`
+	Minimum          json.Number `json:"minimum"`
+	Maximum          json.Number `json:"maximum"`
+	ExclusiveMaximum bool        `json:"exclusiveMaximum"`
 
 	// object
-	Properties map[string]JsonSchema `json:"properties"`
-	AdditionalProperties interface{} `json:"additionalProperties"`
-	Required []string `json:"required"`
-	MinProperties json.Number `json:"minProperties"`
-	MaxProperties json.Number `json:"maxProperties"`
-	Dependencies map[string]JsonSchema `json:"dependencies"`
+	Properties           map[string]JsonSchema `json:"properties"`
+	AdditionalProperties interface{}           `json:"additionalProperties"`
+	Required             []string              `json:"required"`
+	MinProperties        json.Number           `json:"minProperties"`
+	MaxProperties        json.Number           `json:"maxProperties"`
+	Dependencies         map[string]JsonSchema `json:"dependencies"`
 
 	// array
-	Items interface{} `json:"items"`
-	AdditionalItems bool `json:"additionalItems"`
-	MinItems json.Number `json:"minItems"`
-	MaxItems json.Number `json:"maxItems"`
-	UniqueItems bool `json:"uniqueItems"`
+	Items           interface{} `json:"items"`
+	AdditionalItems bool        `json:"additionalItems"`
+	MinItems        json.Number `json:"minItems"`
+	MaxItems        json.Number `json:"maxItems"`
+	UniqueItems     bool        `json:"uniqueItems"`
 
 	// combining
 	AllOf []JsonSchema `json:"allOf"`
 	AnyOf []JsonSchema `json:"anyOf"`
 	OneOf []JsonSchema `json:"oneOf"`
-	Not []JsonSchema `json:"not"`
+	Not   []JsonSchema `json:"not"`
 }
 
-func (schema JsonSchema) GetItemList() ([]JsonSchema) {
+func (schema JsonSchema) GetItemList() []JsonSchema {
 	if schema.Items == nil {
 		return nil
 	}
@@ -65,12 +65,12 @@ func (schema JsonSchema) GetItemList() ([]JsonSchema) {
 	case reflect.Map:
 		var s JsonSchema
 		json.Unmarshal(j, &s)
-		res = []JsonSchema{ s }
+		res = []JsonSchema{s}
 	}
 	return res
 }
 
-func (schema JsonSchema) IsRequired(key string) (bool) {
+func (schema JsonSchema) IsRequired(key string) bool {
 	if schema.Required == nil {
 		return false
 	}
@@ -82,7 +82,7 @@ func (schema JsonSchema) IsRequired(key string) (bool) {
 	return false
 }
 
-func (schema JsonSchema) GetRefSchema(pointer *gojsonpointer.JsonPointer) (JsonSchema) {
+func (schema JsonSchema) GetRefSchema(pointer *gojsonpointer.JsonPointer) JsonSchema {
 	path := strings.Split(pointer.String(), "/")
 	s := schema
 	i := 0
@@ -97,7 +97,7 @@ func (schema JsonSchema) GetRefSchema(pointer *gojsonpointer.JsonPointer) (JsonS
 	return s
 }
 
-func (schema JsonSchema) GetRefList() ([]string) {
+func (schema JsonSchema) GetRefList() []string {
 	res := []string{}
 	switch schema.Type {
 	case JsonSchemaTypeObject:
@@ -116,6 +116,6 @@ func (schema JsonSchema) GetRefList() ([]string) {
 	return res
 }
 
-func (schema JsonSchema) HasReference() (bool) {
+func (schema JsonSchema) HasReference() bool {
 	return schema.Ref != ""
 }

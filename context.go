@@ -1,16 +1,16 @@
 package main
 
 import (
-	"path/filepath"
-	"os"
 	"errors"
 	"github.com/codegangsta/cli"
+	"os"
+	"path/filepath"
 )
 
 type Context struct {
-	Config Config
+	Config        Config
 	OutputDirPath string
-	Inputs []string
+	Inputs        []string
 }
 
 func NewContext(configFilePath string, outDir string, args cli.Args) (Context, error) {
@@ -44,7 +44,7 @@ func NewContext(configFilePath string, outDir string, args cli.Args) (Context, e
 	return context, nil
 }
 
-func (c Context) OutputsFiles() (bool) {
+func (c Context) OutputsFiles() bool {
 	return c.OutputDirPath != ""
 }
 

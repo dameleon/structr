@@ -10,8 +10,8 @@ type NodeCreator interface {
 	CreateTypeNode(bundle Bundle, additionalKey string) (TypeNode, error)
 }
 
-func NewJsonSchemaNodeCreator(context Context, bundler JsonSchemaBundler) (NodeCreator) {
-	return &jsonSchemaNodeCreator{ context, bundler }
+func NewJsonSchemaNodeCreator(context Context, bundler JsonSchemaBundler) NodeCreator {
+	return &jsonSchemaNodeCreator{context, bundler}
 }
 
 type jsonSchemaNodeCreator struct {
@@ -79,7 +79,7 @@ func (creator *jsonSchemaNodeCreator) CreatePropertyNode(name string, bundle Bun
 	if err != nil {
 		return PropertyNode{}, err
 	}
-	return PropertyNode{ name, typeNode, isRequired }, nil
+	return PropertyNode{name, typeNode, isRequired}, nil
 }
 
 func (creator *jsonSchemaNodeCreator) CreateTypeNode(bdl Bundle, additionalKey string) (TypeNode, error) {
@@ -119,15 +119,14 @@ func (creator *jsonSchemaNodeCreator) CreateTypeNode(bdl Bundle, additionalKey s
 	}
 }
 
-func newSpecifiedTypeNode(typ string) (TypeNode) {
-	return TypeNode{ typ, nil }
+func newSpecifiedTypeNode(typ string) TypeNode {
+	return TypeNode{typ, nil}
 }
 
-func newArrayTypeNode(containType TypeNode) (TypeNode) {
-	return TypeNode{ JsonSchemaTypeArray, &containType }
+func newArrayTypeNode(containType TypeNode) TypeNode {
+	return TypeNode{JsonSchemaTypeArray, &containType}
 }
 
-func newObjectTypeNode(containType TypeNode) (TypeNode) {
-	return TypeNode{ JsonSchemaTypeObject, &containType }
+func newObjectTypeNode(containType TypeNode) TypeNode {
+	return TypeNode{JsonSchemaTypeObject, &containType}
 }
-

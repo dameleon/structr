@@ -2,27 +2,27 @@ package main
 
 import (
 	"bytes"
-	"path/filepath"
-	"os"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 )
 
 type Exporter interface {
-	Export(node StructureNode) (error)
+	Export(node StructureNode) error
 }
 
-func NewExporter(context Context) (Exporter) {
+func NewExporter(context Context) Exporter {
 	if context.OutputsFiles() {
-		return &fileExporter{ context }
+		return &fileExporter{context}
 	}
-	return &stdoutExporter{ context }
+	return &stdoutExporter{context}
 }
 
 type stdoutExporter struct {
 	context Context
 }
 
-func (e *stdoutExporter) Export(node StructureNode) (error) {
+func (e *stdoutExporter) Export(node StructureNode) error {
 	conf := e.context.Config
 	generator, err := NewStructGenerator(conf.StructureTemplate, conf.ChildStructuresNesting, conf.TypeTranslateMap)
 	if err != nil {
@@ -40,7 +40,7 @@ type fileExporter struct {
 	context Context
 }
 
-func (e *fileExporter) Export(node StructureNode) (error) {
+func (e *fileExporter) Export(node StructureNode) error {
 	conf := e.context.Config
 	generator, err := NewStructGenerator(conf.StructureTemplate, conf.ChildStructuresNesting, conf.TypeTranslateMap)
 	if err != nil {
@@ -60,7 +60,7 @@ func (e *fileExporter) Export(node StructureNode) (error) {
 	return ioutil.WriteFile(filepath.Join(e.context.OutputDirPath, filename), []byte(str), os.ModePerm)
 }
 
-func (e *fileExporter) mkdirIfNeeded() (error) {
+func (e *fileExporter) mkdirIfNeeded() error {
 	info, err := os.Stat(e.context.OutputDirPath)
 	if info != nil && info.IsDir() {
 		return nil
