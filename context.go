@@ -15,7 +15,7 @@ type Context struct {
 
 func NewContext(configFilePath string, outDir string, args cli.Args) (Context, error) {
 	var context Context
-	cwd, err := os.Getwd()
+	wd, err := os.Getwd()
 	if err != nil {
 		return context, err
 	}
@@ -23,7 +23,7 @@ func NewContext(configFilePath string, outDir string, args cli.Args) (Context, e
 	if configFilePath == "" {
 		return context, errors.New("config flag must be specified")
 	} else if !filepath.IsAbs(configFilePath) {
-		configFilePath = filepath.Join(cwd, configFilePath)
+		configFilePath = filepath.Join(wd, configFilePath)
 	}
 	config, err := NewConfig(configFilePath)
 	if err != nil {
@@ -32,11 +32,11 @@ func NewContext(configFilePath string, outDir string, args cli.Args) (Context, e
 	context.Config = config
 	// register out dir if specified
 	if outDir != "" && !filepath.IsAbs(outDir) {
-		outDir = filepath.Join(cwd, outDir)
+		outDir = filepath.Join(wd, outDir)
 	}
 	context.OutputDirPath = outDir
 	// register inputs
-	inputs, err := context.createInputs(args, cwd)
+	inputs, err := createInputs(args, wd)
 	if err != nil {
 		return context, err
 	}
@@ -44,7 +44,11 @@ func NewContext(configFilePath string, outDir string, args cli.Args) (Context, e
 	return context, nil
 }
 
-func (c Context) createInputs(args cli.Args, cwd string) ([]string, error) {
+func (c Context) OutputsFiles() (bool) {
+	return c.OutputDirPath != ""
+}
+
+func createInputs(args cli.Args, wd string) ([]string, error) {
 	res := []string{}
 	for _, arg := range args {
 		files, err := filepath.Glob(arg)
@@ -57,13 +61,9 @@ func (c Context) createInputs(args cli.Args, cwd string) ([]string, error) {
 				return res, err
 			}
 			if !info.IsDir() {
-				res = append(res, filepath.Join(cwd, arg))
+				res = append(res, filepath.Join(wd, arg))
 			}
 		}
 	}
 	return res, nil
-}
-
-func (c Context) OutputsFiles() (bool) {
-	return c.OutputDirPath != ""
 }

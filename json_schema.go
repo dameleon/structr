@@ -56,6 +56,7 @@ func (schema JsonSchema) GetItemList() ([]JsonSchema) {
 	if schema.Items == nil {
 		return nil
 	}
+	// schema.items defined type of Object or array
 	j, _ := json.Marshal(schema.Items)
 	var res []JsonSchema
 	switch reflect.ValueOf(schema.Items).Kind() {

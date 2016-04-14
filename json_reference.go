@@ -10,4 +10,3 @@ func NewRelativeJsonReference(base gojsonreference.JsonReference, ref gojsonrefe
 	}
 	return gojsonreference.NewJsonReference(base.GetUrl().ResolveReference(ref.GetUrl()).String())
 }
-
