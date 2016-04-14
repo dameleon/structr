@@ -23,7 +23,7 @@ type StructGenerator interface {
 func NewStructGenerator(templateString string, nesting string, typeTranslateMap map[string]string) (StructGenerator, error) {
 	g := &structGenerator{
 		typeTranslateMap: typeTranslateMap,
-		nesting: nesting,
+		nesting:          nesting,
 	}
 	var err error
 	g.template, err = NewTemplate("StructTemplate").Funcs(template.FuncMap{
