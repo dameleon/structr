@@ -64,20 +64,26 @@ $ structr template > ${YOUR_CONFIGURATION_YAML_FILE}
 $ structr generate -c ${YOUR_CONFIGURATION_YAML_FILE} ${INPUT_FILE_PATH}
 
 struct YourStruct {
+
     var hoo: String?   
     var bar: String?  
     var child: ChildStruct?
     var dependency: YourDependencyStruct?
 
     struct ChildStruct {
+    
         var baz: String?
+
     }
+
 }
 
 struct YourDependencyStruct {
+
     var hoge: String?
     var fuga: String?
     var piyo: String?
+
 }
 
 

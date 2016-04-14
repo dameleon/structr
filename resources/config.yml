@@ -20,8 +20,8 @@ output_dependencies: true
 structure_template: |
   struct {{.Name|toUpperCamelCase}} {
   {{range .Properties}}
-      var {{.Name}}: {{.Type|translateTypeName|toUpperCamelCase}}?
-  {{end}}
+      var {{.Name}}: {{.Type|translateTypeName|toUpperCamelCase}}?{{end}}
+
   {{.Children|extractStructures}}
   }
 
