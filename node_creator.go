@@ -25,10 +25,9 @@ func (creator *jsonSchemaNodeCreator) CreateStructureNode(name string, rootBundl
 		return StructureNode{}, fmt.Errorf("root schema must be object type. TYPE: %s", rootSchema.Type.String())
 	}
 	node := StructureNode{
-		name,
-		[]PropertyNode{},
-		[]StructureNode{},
-		nil,
+		Name: name,
+		Properties: []PropertyNode{},
+		Children: []StructureNode{},
 	}
 	childrenMap := make(map[string]StructureNode)
 	for key, schema := range rootSchema.Properties {
@@ -79,7 +78,11 @@ func (creator *jsonSchemaNodeCreator) CreatePropertyNode(name string, bundle Bun
 	if err != nil {
 		return PropertyNode{}, err
 	}
-	return PropertyNode{name, typeNode, isRequired}, nil
+	return PropertyNode{
+		Name: name,
+		Type: typeNode,
+		IsRequired: isRequired,
+	}, nil
 }
 
 func (creator *jsonSchemaNodeCreator) CreateTypeNode(bdl Bundle, additionalKey string) (TypeNode, error) {

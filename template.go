@@ -21,7 +21,10 @@ type StructGenerator interface {
 }
 
 func NewStructGenerator(templateString string, nesting string, typeTranslateMap map[string]string) (StructGenerator, error) {
-	g := &structGenerator{typeTranslateMap, nesting, nil}
+	g := &structGenerator{
+		typeTranslateMap: typeTranslateMap,
+		nesting: nesting,
+	}
 	var err error
 	g.template, err = NewTemplate("StructTemplate").Funcs(template.FuncMap{
 		"translateTypeName": g.translateTypeName,
@@ -39,6 +42,8 @@ type structGenerator struct {
 	template         *template.Template
 }
 
+var nestingLinePattern = regexp.MustCompile(`(.*(\r\n|\n)?)`)
+
 func (g *structGenerator) Generate(node StructureNode) (string, error) {
 	nest := ""
 	p := node.Parent
@@ -50,8 +55,7 @@ func (g *structGenerator) Generate(node StructureNode) (string, error) {
 	if err := g.template.Execute(&buf, node); err != nil {
 		return "", err
 	}
-	re := regexp.MustCompile(`(.*(\r\n|\n)?)`)
-	return re.ReplaceAllString(buf.String(), nest+"$1"), nil
+	return nestingLinePattern.ReplaceAllString(buf.String(), nest+"$1"), nil
 }
 
 func (g *structGenerator) extractStructures(nodes []StructureNode) string {
@@ -97,7 +101,8 @@ func toLowerCamelCase(str string) string {
 	return strings.Replace(s, f, strings.ToLower(f), 1)
 }
 
+var replaceSnakeBodyPattern = regexp.MustCompile(`[_-]`)
+
 func replaceSnakeBodyToSpace(str string) string {
-	r := regexp.MustCompile(`[_-]`)
-	return r.ReplaceAllString(str, " ")
+	return replaceSnakeBodyPattern.ReplaceAllString(str, " ")
 }

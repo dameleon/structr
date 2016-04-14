@@ -14,7 +14,7 @@ type Config struct {
 }
 
 func NewConfig(filepath string) (Config, error) {
-	config := Config{}
+	var config Config
 	f, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		return config, err

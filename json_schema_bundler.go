@@ -17,8 +17,8 @@ type bundler struct {
 
 func NewJsonSchemaBundler(loader JsonSchemaLoader) JsonSchemaBundler {
 	b := &bundler{
-		loader,
-		make(map[string]Bundle),
+		loader: loader,
+		bundles: make(map[string]Bundle),
 	}
 	return b
 }
