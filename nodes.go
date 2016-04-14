@@ -4,6 +4,7 @@ type StructureNode struct {
 	Name string
 	Properties []PropertyNode
 	Children []StructureNode
+	Parent *StructureNode
 }
 
 type PropertyNode struct {

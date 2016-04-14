@@ -6,10 +6,11 @@ import (
 )
 
 type Config struct {
-	TypeTranslateMap    map[string]string `yaml:"type_translate_map"`
-	OutputFilename      string `yaml:"output_filename"`
-	OutputDependencies  bool `yaml:"output_dependencies"`
-	StructureTemplate   string `yaml:"structure_template"`
+	TypeTranslateMap       map[string]string `yaml:"type_translate_map"`
+	OutputFilename         string `yaml:"output_filename"`
+	OutputDependencies     bool `yaml:"output_dependencies"`
+	StructureTemplate      string `yaml:"structure_template"`
+	ChildStructuresNesting string `yaml:"child_structures_nesting"`
 }
 
 func NewConfig(filepath string) (Config, error) {

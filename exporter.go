@@ -24,14 +24,16 @@ type stdoutExporter struct {
 
 func (e *stdoutExporter) Export(node StructureNode) (error) {
 	conf := e.context.Config
-	generator, err := NewStructGenerator(conf.StructureTemplate, conf.TypeTranslateMap)
+	generator, err := NewStructGenerator(conf.StructureTemplate, conf.ChildStructuresNesting, conf.TypeTranslateMap)
 	if err != nil {
 		return err
 	}
-	if err := generator.Generate(os.Stdout, node); err != nil {
+	str, err := generator.Generate(node)
+	if err != nil {
 		return err
 	}
-	return nil
+	_, err = os.Stdout.WriteString(str)
+	return err
 }
 
 type fileExporter struct {
@@ -40,12 +42,12 @@ type fileExporter struct {
 
 func (e *fileExporter) Export(node StructureNode) (error) {
 	conf := e.context.Config
-	generator, err := NewStructGenerator(conf.StructureTemplate, conf.TypeTranslateMap)
+	generator, err := NewStructGenerator(conf.StructureTemplate, conf.ChildStructuresNesting, conf.TypeTranslateMap)
 	if err != nil {
 		return err
 	}
-	var buf bytes.Buffer
-	if err := generator.Generate(&buf, node); err != nil {
+	str, err := generator.Generate(node)
+	if err != nil {
 		return err
 	}
 	if err := e.mkdirIfNeeded(); err != nil {
@@ -55,7 +57,7 @@ func (e *fileExporter) Export(node StructureNode) (error) {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(filepath.Join(e.context.OutputDirPath, filename), buf.Bytes(), os.ModePerm)
+	return ioutil.WriteFile(filepath.Join(e.context.OutputDirPath, filename), []byte(str), os.ModePerm)
 }
 
 func (e *fileExporter) mkdirIfNeeded() (error) {

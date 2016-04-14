@@ -5,7 +5,6 @@ import (
 	"strings"
 	"regexp"
 	"bytes"
-	"io"
 )
 
 var commonFuncMap = template.FuncMap{
@@ -18,11 +17,11 @@ func NewTemplate(name string) (*template.Template) {
 }
 
 type StructGenerator interface {
-	Generate(wr io.Writer, node StructureNode) (error)
+	Generate(node StructureNode) (string, error)
 }
 
-func NewStructGenerator(templateString string, typeTranslateMap map[string]string) (StructGenerator, error) {
-	g := &structGenerator{ typeTranslateMap, nil }
+func NewStructGenerator(templateString string, nesting string, typeTranslateMap map[string]string) (StructGenerator, error) {
+	g := &structGenerator{ typeTranslateMap, nesting, nil }
 	var err error
 	g.template, err = NewTemplate("StructTemplate").Funcs(template.FuncMap{
 		"translateTypeName": g.translateTypeName,
@@ -36,22 +35,33 @@ func NewStructGenerator(templateString string, typeTranslateMap map[string]strin
 
 type structGenerator struct {
 	typeTranslateMap map[string]string
+	nesting string
 	template *template.Template
 }
 
-func (g *structGenerator) Generate(wr io.Writer, node StructureNode) (error) {
-	return g.template.Execute(wr, node)
+func (g *structGenerator) Generate(node StructureNode) (string, error) {
+	nest := ""
+	p := node.Parent
+	for p != nil {
+		p = p.Parent
+		nest += g.nesting
+	}
+	var buf bytes.Buffer
+	if err := g.template.Execute(&buf, node); err != nil {
+		return "", err
+	}
+	re := regexp.MustCompile(`(.*(\r\n|\n)?)`)
+	return re.ReplaceAllString(buf.String(), nest + "$1"), nil
 }
 
 func (g *structGenerator) extractStructures(nodes []StructureNode) (string) {
 	res := []string{}
 	for _, node := range nodes {
-		var buf bytes.Buffer
-		err := g.Generate(&buf, node)
+		str, err := g.Generate(node)
 		if err != nil {
 			panic(err)
 		}
-		res = append(res, buf.String())
+		res = append(res, str)
 	}
 	return strings.Join(res, "")
 }

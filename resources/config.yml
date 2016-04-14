@@ -24,3 +24,6 @@ structure_template: |
   {{end}}
   {{.Children|extractStructures}}
   }
+
+# If the structure has children, to specify strings to nest structure of children
+child_structures_nesting: "    "

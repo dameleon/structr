@@ -1,6 +1,9 @@
 package main
 
-import "errors"
+import (
+	"errors"
+	"github.com/k0kubun/pp"
+)
 
 type NodeCreator interface {
 	CreateStructureNode(bundle Bundle) (StructureNode, error)
@@ -20,9 +23,15 @@ type jsonSchemaNodeCreator struct {
 func (creator *jsonSchemaNodeCreator) CreateStructureNode(rootBundle Bundle) (StructureNode, error) {
 	rootSchema := rootBundle.Schema
 	if rootSchema.Type != JsonSchemaTypeObject {
-		return StructureNode{}, errors.New("root schema must be object type")
+		pp.Print(rootSchema)
+		return StructureNode{}, errors.New("root schema must be object type. TYPE: " + rootSchema.Type.String())
 	}
-	properties := []PropertyNode{}
+	node := StructureNode{
+		rootBundle.GetName(),
+		[]PropertyNode{},
+		[]StructureNode{},
+		nil,
+	}
 	childrenMap := make(map[string]StructureNode)
 	for key, schema := range rootSchema.Properties {
 		var bdl Bundle
@@ -41,16 +50,15 @@ func (creator *jsonSchemaNodeCreator) CreateStructureNode(rootBundle Bundle) (St
 		if err != nil {
 			return StructureNode{}, err
 		}
-		properties = append(properties, prop)
+		node.Properties = append(node.Properties, prop)
 		// create children
 		if innerType := prop.Type.InnerType; innerType != nil && !bdl.IsReferred {
 			name := innerType.EntityName()
 			schema := schema
-			switch schema.Type {
-			case JsonSchemaTypeArray:
+			if schema.Type == JsonSchemaTypeArray {
 				schema = schema.GetItemList()[0]
-				fallthrough
-			case JsonSchemaTypeObject:
+			}
+			if schema.Type == JsonSchemaTypeObject {
 				if _, ok := childrenMap[name]; !ok {
 					child, err := creator.CreateStructureNode(bdl.CreateChild(schema))
 					if err != nil {
@@ -61,15 +69,11 @@ func (creator *jsonSchemaNodeCreator) CreateStructureNode(rootBundle Bundle) (St
 			}
 		}
 	}
-	children := []StructureNode{}
 	for _, v := range childrenMap {
-		children = append(children, v)
+		v.Parent = &node
+		node.Children = append(node.Children, v)
 	}
-	return StructureNode{
-		rootBundle.GetName(),
-		properties,
-		children,
-	}, nil
+	return node, nil
 }
 
 func (creator *jsonSchemaNodeCreator) CreatePropertyNode(name string, bundle Bundle, isRequired bool) (PropertyNode, error) {
