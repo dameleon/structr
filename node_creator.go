@@ -26,7 +26,7 @@ func (creator *jsonSchemaNodeCreator) CreateStructureNode(name string, rootBundl
 	}
 	rootSchema := rootBundle.Schema
 	if rootSchema.Type == JsonSchemaTypeArray {
-		return creator.CreateStructureNode(name, rootBundle.CreateChild(rootSchema.GetItemList()[0]))
+		return creator.CreateStructureNode(name, NewChildBundle(rootBundle, rootSchema.GetItemList()[0]))
 	} else if rootSchema.Type != JsonSchemaTypeObject {
 		return StructureNode{}, fmt.Errorf("root schema must be object type. TYPE: %s", rootSchema.Type.String())
 	}
@@ -37,7 +37,7 @@ func (creator *jsonSchemaNodeCreator) CreateStructureNode(name string, rootBundl
 	}
 	childrenMap := make(map[string]StructureNode)
 	for key, schema := range rootSchema.Properties {
-		bdl, err := creator.bundler.GetReferredBundleWalk(rootBundle.CreateChild(schema))
+		bdl, err := creator.bundler.GetReferredBundleWalk(NewNamedChildBundle(rootBundle, schema, key))
 		if err != nil {
 			return node, err
 		}
@@ -52,12 +52,13 @@ func (creator *jsonSchemaNodeCreator) CreateStructureNode(name string, rootBundl
 			name := innerType.EntityName()
 			bdl := bdl
 			for bdl.Schema.Type == JsonSchemaTypeArray {
-				bdl, err = creator.bundler.GetReferredBundleWalk(bdl.CreateChild(bdl.Schema.GetItemList()[0]))
+				bdl, err = creator.bundler.GetReferredBundleWalk(NewChildBundle(bdl, bdl.Schema.GetItemList()[0]))
 				if err != nil {
 					return node, err
 				}
 			}
-			if _, ok := childrenMap[name]; !ok && !bdl.IsReferred {
+			_, ok := childrenMap[name]
+			if rootBundle.IsSameRef(bdl) && bdl.HasParent && !ok {
 				child, err := creator.CreateStructureNode(name, bdl)
 				if err != nil {
 					return StructureNode{}, err
@@ -92,7 +93,7 @@ func (creator *jsonSchemaNodeCreator) CreateTypeNode(bdl Bundle, additionalKey s
 		return newSpecifiedTypeNode(schema.Type.String()), nil
 	case schema.Type == JsonSchemaTypeArray:
 		// TODO: not support multiple item types
-		innerBundle, err := creator.bundler.GetReferredBundleWalk(bdl.CreateChild(schema.GetItemList()[0]))
+		innerBundle, err := creator.bundler.GetReferredBundleWalk(NewChildBundle(bdl, bdl.Schema.GetItemList()[0]))
 		if err != nil {
 			return TypeNode{}, err
 		}
@@ -103,13 +104,7 @@ func (creator *jsonSchemaNodeCreator) CreateTypeNode(bdl Bundle, additionalKey s
 		}
 		return newArrayTypeNode(innerNode), nil
 	case schema.Type == JsonSchemaTypeObject:
-		var typ string
-		if bdl.IsReferred {
-			typ = bdl.GetName()
-		} else {
-			typ = additionalKey
-		}
-		return newObjectTypeNode(newSpecifiedTypeNode(typ)), nil
+		return newObjectTypeNode(newSpecifiedTypeNode(bdl.Name)), nil
 	default:
 		panic("undefined type")
 	}

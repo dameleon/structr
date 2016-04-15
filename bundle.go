@@ -7,9 +7,34 @@ import (
 )
 
 type Bundle struct {
+	Name       string
 	Ref        gojsonreference.JsonReference
 	Schema     JsonSchema
 	IsReferred bool
+	HasParent  bool
+}
+
+func NewBundle(ref gojsonreference.JsonReference, schema JsonSchema, isReferred bool) Bundle {
+	var name string
+	if schema.Id != "" {
+		name = schema.Id
+	} else {
+		basename := filepath.Base(ref.GetUrl().String())
+		name = strings.Replace(basename, filepath.Ext(basename), "", 1)
+	}
+	return Bundle{ name, ref, schema, isReferred, false }
+}
+
+func NewNamedChildBundle(bundle Bundle, schema JsonSchema, specifiedKey string) Bundle {
+	name := bundle.Name
+	if specifiedKey != "" {
+		name = specifiedKey
+	}
+	return Bundle{ name, bundle.Ref, schema, bundle.IsReferred, true }
+}
+
+func NewChildBundle(bundle Bundle, schema JsonSchema) Bundle {
+	return NewNamedChildBundle(bundle, schema, bundle.Name)
 }
 
 func (b Bundle) GetRelativeJsonReference(path string) (gojsonreference.JsonReference, error) {
@@ -20,14 +45,6 @@ func (b Bundle) GetRelativeJsonReference(path string) (gojsonreference.JsonRefer
 	return NewRelativeJsonReference(b.Ref, ref)
 }
 
-func (b Bundle) GetName() string {
-	if b.Schema.Id != "" {
-		return b.Schema.Id
-	}
-	basename := filepath.Base(b.Ref.GetUrl().String())
-	return strings.Replace(basename, filepath.Ext(basename), "", 1)
-}
-
-func (b Bundle) CreateChild(schema JsonSchema) Bundle {
-	return Bundle{b.Ref, schema, b.IsReferred}
+func (b Bundle) IsSameRef(bundle Bundle) bool {
+	return b.Ref.GetUrl() == bundle.Ref.GetUrl()
 }

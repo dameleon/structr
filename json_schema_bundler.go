@@ -34,7 +34,7 @@ func (b *bundler) AddJsonSchema(paths ...string) error {
 		if err != nil {
 			return err
 		}
-		bdl := Bundle{ref, schema, false}
+		bdl := NewBundle(ref, schema, false)
 		for _, r := range bdl.Schema.GetRefList() {
 			ref, err := bdl.GetRelativeJsonReference(r)
 			if err != nil {
@@ -44,7 +44,7 @@ func (b *bundler) AddJsonSchema(paths ...string) error {
 			if err != nil {
 				return err
 			}
-			b.registerNewBundle(Bundle{ref, schema, true})
+			b.registerNewBundle(NewBundle(ref, schema, true))
 		}
 		b.registerNewBundle(bdl)
 	}
