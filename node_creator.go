@@ -37,7 +37,7 @@ func (creator *jsonSchemaNodeCreator) CreateStructureNode(name string, rootBundl
 	}
 	childrenMap := make(map[string]StructureNode)
 	for key, schema := range rootSchema.Properties {
-		bdl, err := creator.bundler.GetReferredBundleWalk(NewNamedChildBundle(rootBundle, schema, key))
+		bdl, err := creator.bundler.GetReferredBundleWalk(NewNamedChildBundle(rootBundle, key, schema))
 		if err != nil {
 			return node, err
 		}
