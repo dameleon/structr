@@ -1,0 +1,65 @@
+{
+  "type": "object",
+  "properties": {
+    "stringType": {
+      "type": "string"
+    },
+    "integerType": {
+      "type": "integer"
+    },
+    "numberType": {
+      "type": "number"
+    },
+    "booleanType": {
+      "type": "boolean"
+    },
+    "nullType": {
+      "type": "null"
+    },
+    "objectType": {
+      "type": "object",
+      "properties": {
+        "foo": {
+          "type": "string"
+        },
+        "bar": {
+          "type": "integer"
+        },
+        "baz": {
+          "type": "number"
+        },
+        "qux": {
+          "type": "object",
+          "properties": {
+            "foo": {
+              "type": "string"
+            },
+            "bar": {
+              "type": "integer"
+            },
+            "baz": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "arrayType": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "hoge": {
+            "type": "string"
+          },
+          "fuga": {
+            "type": "integer"
+          },
+          "piyo": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}

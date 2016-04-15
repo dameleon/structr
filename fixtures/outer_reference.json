@@ -1,0 +1,29 @@
+{
+  "type": "object",
+  "properties": {
+    "stringType": {
+      "type": "string"
+    },
+    "integerType": {
+      "type": "integer"
+    },
+    "numberType": {
+      "type": "number"
+    },
+    "booleanType": {
+      "type": "boolean"
+    },
+    "nullType": {
+      "type": "null"
+    },
+    "objectType": {
+      "$ref": "outer_referred.json#/definitions/refObjectType"
+    },
+    "arrayType": {
+      "type": "array",
+      "items": {
+        "$ref": "outer_referred.json#/definitions/refArrayType"
+      }
+    }
+  }
+}

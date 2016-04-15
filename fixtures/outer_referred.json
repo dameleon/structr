@@ -1,0 +1,55 @@
+{
+  "definitions": {
+    "refObjectType": {
+      "type": "object",
+      "properties": {
+        "foo": {
+          "type": "string"
+        },
+        "bar": {
+          "type": "integer"
+        },
+        "baz": {
+          "type": "number"
+        },
+        "qux": {
+          "type": "object",
+          "properties": {
+            "foo": {
+              "type": "string"
+            },
+            "bar": {
+              "type": "integer"
+            },
+            "baz": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "refArrayType": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "hoge": {
+            "type": "string"
+          },
+          "fuga": {
+            "type": "integer"
+          },
+          "piyo": {
+            "type": "number"
+          },
+          "hage": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/refObjectType"
+            }
+          }
+        }
+      }
+    }
+  }
+}
