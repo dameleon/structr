@@ -1,4 +1,58 @@
 {
+  "definitions": {
+    "refObjectType": {
+      "type": "object",
+      "properties": {
+        "foo": {
+          "type": "string"
+        },
+        "bar": {
+          "type": "integer"
+        },
+        "baz": {
+          "type": "number"
+        },
+        "nested": {
+          "type": "object",
+          "properties": {
+            "foo": {
+              "type": "string"
+            },
+            "bar": {
+              "type": "integer"
+            },
+            "baz": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "refArrayType": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "foo": {
+            "type": "string"
+          },
+          "bar": {
+            "type": "integer"
+          },
+          "baz": {
+            "type": "number"
+          },
+          "nested": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/refObjectType"
+            }
+          }
+        }
+      }
+    }
+  },
+
   "type": "object",
   "properties": {
     "stringType": {
@@ -17,49 +71,10 @@
       "type": "null"
     },
     "objectType": {
-      "type": "object",
-      "properties": {
-        "foo": {
-          "type": "string"
-        },
-        "bar": {
-          "type": "integer"
-        },
-        "baz": {
-          "type": "number"
-        },
-        "qux": {
-          "type": "object",
-          "properties": {
-            "foo": {
-              "type": "string"
-            },
-            "bar": {
-              "type": "integer"
-            },
-            "baz": {
-              "type": "number"
-            }
-          }
-        }
-      }
+      "$ref": "#/definitions/refObjectType"
     },
     "arrayType": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "hoge": {
-            "type": "string"
-          },
-          "fuga": {
-            "type": "integer"
-          },
-          "piyo": {
-            "type": "number"
-          }
-        }
-      }
+      "$ref": "#/definitions/refArrayType"
     }
   }
 }

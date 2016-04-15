@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "properties": {
+    "stringType": {
+      "$ref": "./type/string.json"
+    },
+    "integerType": {
+      "$ref": "./type/integer.json"
+    },
+    "numberType": {
+      "$ref": "./type/number.json"
+    },
+    "booleanType": {
+      "$ref": "./type/boolean.json"
+    },
+    "nullType": {
+      "$ref": "./type/null.json"
+    },
+    "objectType": {
+      "$ref": "./type/objects.json"
+    },
+    "array": {
+      "$ref": "./type/string_array.json"
+    }
+  }
+}
