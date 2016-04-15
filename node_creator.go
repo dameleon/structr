@@ -28,6 +28,7 @@ func (creator *jsonSchemaNodeCreator) CreateStructureNode(name string, rootBundl
 	if rootSchema.Type == JsonSchemaTypeArray {
 		return creator.CreateStructureNode(name, NewChildBundle(rootBundle, rootSchema.GetItemList()[0]))
 	} else if rootSchema.Type != JsonSchemaTypeObject {
+		panic("mogemoge")
 		return StructureNode{}, fmt.Errorf("root schema must be object type. TYPE: %s", rootSchema.Type.String())
 	}
 	node := StructureNode{
@@ -58,7 +59,7 @@ func (creator *jsonSchemaNodeCreator) CreateStructureNode(name string, rootBundl
 				}
 			}
 			_, ok := childrenMap[name]
-			if bdl.Schema.Type == JsonSchemaTypeObject && rootBundle.IsSameRef(bdl) && bdl.HasParent && !ok {
+			if bdl.Schema.HasStructure() && rootBundle.IsSameRef(bdl) && bdl.HasParent && !ok {
 				child, err := creator.CreateStructureNode(name, bdl)
 				if err != nil {
 					return StructureNode{}, err

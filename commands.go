@@ -45,6 +45,9 @@ var commandGenerate = cli.Command{
 		creator := NewJsonSchemaNodeCreator(context, bundler)
 		exporter := NewExporter(context)
 		for _, b := range bundler.GetBundles() {
+			if !b.Schema.HasStructure() {
+				continue
+			}
 			structure, err := creator.CreateStructureNode(b.Name, b)
 			if err != nil {
 				log.Fatalln("cannot create structure node: ", err.Error())

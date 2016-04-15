@@ -119,3 +119,13 @@ func (schema JsonSchema) GetRefList() []string {
 func (schema JsonSchema) HasReference() bool {
 	return schema.Ref != ""
 }
+
+func (schema JsonSchema) HasStructure() bool {
+	switch schema.Type {
+	case JsonSchemaTypeObject:
+		return true
+	case JsonSchemaTypeArray:
+		return schema.GetItemList()[0].HasStructure()
+	}
+	return false
+}
