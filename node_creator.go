@@ -58,7 +58,7 @@ func (creator *jsonSchemaNodeCreator) CreateStructureNode(name string, rootBundl
 				}
 			}
 			_, ok := childrenMap[name]
-			if rootBundle.IsSameRef(bdl) && bdl.HasParent && !ok {
+			if bdl.Schema.Type == JsonSchemaTypeObject && rootBundle.IsSameRef(bdl) && bdl.HasParent && !ok {
 				child, err := creator.CreateStructureNode(name, bdl)
 				if err != nil {
 					return StructureNode{}, err
