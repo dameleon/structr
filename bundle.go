@@ -22,19 +22,15 @@ func NewBundle(ref gojsonreference.JsonReference, schema JsonSchema, isReferred 
 		basename := filepath.Base(ref.GetUrl().String())
 		name = strings.Replace(basename, filepath.Ext(basename), "", 1)
 	}
-	return Bundle{ name, ref, schema, isReferred, false }
+	return Bundle{name, ref, schema, isReferred, false}
 }
 
-func NewNamedChildBundle(bundle Bundle, schema JsonSchema, specifiedKey string) Bundle {
-	name := bundle.Name
-	if specifiedKey != "" {
-		name = specifiedKey
-	}
-	return Bundle{ name, bundle.Ref, schema, bundle.IsReferred, true }
+func NewNamedChildBundle(bundle Bundle, name string, schema JsonSchema) Bundle {
+	return Bundle{name, bundle.Ref, schema, bundle.IsReferred, true}
 }
 
 func NewChildBundle(bundle Bundle, schema JsonSchema) Bundle {
-	return NewNamedChildBundle(bundle, schema, bundle.Name)
+	return Bundle{bundle.Name, bundle.Ref, schema, bundle.IsReferred, true}
 }
 
 func (b Bundle) GetRelativeJsonReference(path string) (gojsonreference.JsonReference, error) {

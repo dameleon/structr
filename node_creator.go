@@ -121,4 +121,3 @@ func newArrayTypeNode(containType TypeNode) TypeNode {
 func newObjectTypeNode(containType TypeNode) TypeNode {
 	return TypeNode{JsonSchemaTypeObject, &containType}
 }
-
