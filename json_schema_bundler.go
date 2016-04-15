@@ -8,6 +8,7 @@ type JsonSchemaBundler interface {
 	AddJsonSchema(paths ...string) error
 	GetBundles() map[string]Bundle
 	GetBundle(ref gojsonreference.JsonReference) Bundle
+	GetReferredBundleWalk(bundle Bundle) (Bundle, error)
 }
 
 type bundler struct {
@@ -66,4 +67,16 @@ func (b *bundler) GetBundle(ref gojsonreference.JsonReference) Bundle {
 		return bdl
 	}
 	panic("undefined bundle")
+}
+
+func (b *bundler) GetReferredBundleWalk(bundle Bundle) (Bundle, error) {
+	if !bundle.Schema.HasReference() {
+		return bundle, nil
+	}
+	ref, err := bundle.GetRelativeJsonReference(bundle.Schema.Ref)
+	if err != nil {
+		return bundle, err
+	}
+	refBundle := b.GetBundle(ref)
+	return b.GetReferredBundleWalk(refBundle)
 }

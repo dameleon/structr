@@ -88,7 +88,7 @@ func (schema JsonSchema) GetRefSchema(pointer *gojsonpointer.JsonPointer) JsonSc
 	i := 0
 	for i < len(path) {
 		p := path[i]
-		if p != "" && p == "definitions" {
+		if p == "definitions" {
 			i++
 			s = s.Definitions[path[i]]
 		}
