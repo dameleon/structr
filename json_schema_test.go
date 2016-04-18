@@ -1,10 +1,10 @@
 package main
 
 import (
-	"testing"
 	"encoding/json"
-	"github.com/xeipuuv/gojsonpointer"
 	"github.com/dameleon/structr/fixtures"
+	"github.com/xeipuuv/gojsonpointer"
+	"testing"
 )
 
 func TestJsonSchema_GetItemList_ByObject(t *testing.T) {

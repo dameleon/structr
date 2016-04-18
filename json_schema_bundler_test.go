@@ -1,9 +1,9 @@
 package main
 
 import (
-	"testing"
-	"github.com/xeipuuv/gojsonreference"
 	"errors"
+	"github.com/xeipuuv/gojsonreference"
+	"testing"
 )
 
 type stubJsonSchemaLoader struct {
@@ -14,21 +14,21 @@ func (l stubJsonSchemaLoader) Load(ref gojsonreference.JsonReference) (JsonSchem
 	if l.cond {
 		switch ref.GetUrl().String() {
 		case "/base":
-			return JsonSchema{ Id: "BaseSchema", Ref: "/referred" }, nil
+			return JsonSchema{Id: "BaseSchema", Ref: "/referred"}, nil
 		case "/referred":
-			return JsonSchema{ Id: "ReferredSchema", Ref: "/deep_referred" }, nil
+			return JsonSchema{Id: "ReferredSchema", Ref: "/deep_referred"}, nil
 		case "/deep_referred":
-			return JsonSchema{ Id: "DeepReferredSchema" }, nil
+			return JsonSchema{Id: "DeepReferredSchema"}, nil
 		}
 	}
-	return JsonSchema{ Id: "ErrorJsonSchema" }, errors.New("cannot load json schema")
+	return JsonSchema{Id: "ErrorJsonSchema"}, errors.New("cannot load json schema")
 }
 
-func newSucceedBundler() (JsonSchemaBundler) {
+func newSucceedBundler() JsonSchemaBundler {
 	return NewJsonSchemaBundler(stubJsonSchemaLoader{true})
 }
 
-func newFailureBundler() (JsonSchemaBundler) {
+func newFailureBundler() JsonSchemaBundler {
 	return NewJsonSchemaBundler(stubJsonSchemaLoader{false})
 }
 

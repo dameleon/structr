@@ -1,8 +1,8 @@
 package main
 
 import (
-	"testing"
 	"github.com/dameleon/structr/fixtures"
+	"testing"
 )
 
 func TestJsonSchemaLoader_Load_FromFile(t *testing.T) {

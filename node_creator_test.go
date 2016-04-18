@@ -1,8 +1,8 @@
 package main
 
 import (
-	"testing"
 	"github.com/dameleon/structr/fixtures"
+	"testing"
 )
 
 func TestJsonSchemaNodeCreator_CreateStructureNode_WithBasicJsonSchema(t *testing.T) {
@@ -28,7 +28,7 @@ func TestJsonSchemaNodeCreator_CreateStructureNode_WithBasicJsonSchema(t *testin
 	}
 	matcher := newPropertiesMatcher(t, node.Properties)
 	for _, typ := range JsonSchemaTypes {
-		matcher.has(typ.String() + "Type", typ.String())
+		matcher.has(typ.String()+"Type", typ.String())
 	}
 	if len(node.Children) != 2 {
 		t.Errorf("children count should be 2. LEN: %d", len(node.Children))
@@ -163,16 +163,16 @@ func TestJsonSchemaNodeCreator_CreateStructureNode_WithExternalReferenceSchema(t
 	}
 }
 
-func newPropertiesMatcher(t *testing.T, properties []PropertyNode) (*propertiesMatcher) {
+func newPropertiesMatcher(t *testing.T, properties []PropertyNode) *propertiesMatcher {
 	props := make(map[string]PropertyNode)
 	for _, p := range properties {
 		props[p.Name] = p
 	}
-	return &propertiesMatcher{ t, props }
+	return &propertiesMatcher{t, props}
 }
 
 type propertiesMatcher struct {
-	t *testing.T
+	t     *testing.T
 	props map[string]PropertyNode
 }
 

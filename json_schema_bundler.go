@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/xeipuuv/gojsonreference"
 	"fmt"
+	"github.com/xeipuuv/gojsonreference"
 )
 
 type JsonSchemaBundler interface {
@@ -44,7 +44,7 @@ func (b *bundler) AddJsonSchema(paths ...string) error {
 	return nil
 }
 
-func (b *bundler) registerReferredBundleWalk(bundle Bundle) (error) {
+func (b *bundler) registerReferredBundleWalk(bundle Bundle) error {
 	for _, r := range bundle.Schema.GetRefList() {
 		ref, err := bundle.GetRelativeJsonReference(r)
 		if err != nil {

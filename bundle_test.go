@@ -1,14 +1,14 @@
 package main
 
 import (
-	"testing"
 	"github.com/xeipuuv/gojsonreference"
+	"testing"
 )
 
 var ref, _ = gojsonreference.NewJsonReference("/foo/bar/baz.json")
 
 func TestNewBundle(t *testing.T) {
-	noIdentifiedBundle := NewBundle(&ref, JsonSchema{ Title: "NoIdentified" }, false)
+	noIdentifiedBundle := NewBundle(&ref, JsonSchema{Title: "NoIdentified"}, false)
 	if noIdentifiedBundle.Name != "baz" {
 		t.Errorf("bundle name should be 'baz'. NAME: %S", noIdentifiedBundle.Name)
 	}
@@ -25,7 +25,7 @@ func TestNewBundle(t *testing.T) {
 		t.Error("has parent should be false")
 	}
 
-	identifiedBundle := NewBundle(&ref, JsonSchema{ Id: "Identified" }, false)
+	identifiedBundle := NewBundle(&ref, JsonSchema{Id: "Identified"}, false)
 	if identifiedBundle.Name != "Identified" {
 		t.Errorf("bundle name should be 'Identified'. NAME: %S", identifiedBundle.Name)
 	}
@@ -35,8 +35,8 @@ func TestNewBundle(t *testing.T) {
 }
 
 func TestNewNamedChildBundle(t *testing.T) {
-	rootBundle := NewBundle(&ref, JsonSchema{ Id: "Root" }, false)
-	bundle := NewNamedChildBundle(rootBundle, "Child", JsonSchema{ Id: "ChildSchema" })
+	rootBundle := NewBundle(&ref, JsonSchema{Id: "Root"}, false)
+	bundle := NewNamedChildBundle(rootBundle, "Child", JsonSchema{Id: "ChildSchema"})
 	if bundle.Name != "Child" {
 		t.Errorf("bundle name should be 'Child'. NAME: %s", bundle.Name)
 	}
@@ -52,8 +52,8 @@ func TestNewNamedChildBundle(t *testing.T) {
 }
 
 func TestNewChildBundle(t *testing.T) {
-	rootBundle := NewBundle(&ref, JsonSchema{ Id: "Root" }, false)
-	bundle := NewChildBundle(rootBundle, JsonSchema{ Id: "Child" })
+	rootBundle := NewBundle(&ref, JsonSchema{Id: "Root"}, false)
+	bundle := NewChildBundle(rootBundle, JsonSchema{Id: "Child"})
 	if bundle.Name != "Root" {
 		t.Errorf("bundle name should be 'Root'. NAME: %s", bundle.Name)
 	}
@@ -69,7 +69,7 @@ func TestNewChildBundle(t *testing.T) {
 }
 
 func TestBundle_GetRelativeJsonReference(t *testing.T) {
-	rootBundle := NewBundle(&ref, JsonSchema{ Id: "Root" }, false)
+	rootBundle := NewBundle(&ref, JsonSchema{Id: "Root"}, false)
 	// relative path
 	ref, err := rootBundle.GetRelativeJsonReference("./hoge/fuga/piyo.json")
 	if err != nil {
@@ -86,8 +86,8 @@ func TestBundle_GetRelativeJsonReference(t *testing.T) {
 }
 
 func TestBundle_IsSameRef(t *testing.T) {
-	rootBundle := NewBundle(&ref, JsonSchema{ Id: "Root" }, false)
-	childBundle := NewChildBundle(rootBundle, JsonSchema{ Id: "Child" })
+	rootBundle := NewBundle(&ref, JsonSchema{Id: "Root"}, false)
+	childBundle := NewChildBundle(rootBundle, JsonSchema{Id: "Child"})
 
 	if rootBundle.IsSameRef(childBundle) != true {
 		t.Error("is same ref should be true")
