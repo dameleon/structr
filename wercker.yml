@@ -1,4 +1,4 @@
-box: golang
+box: tcnksm/gox
 build:
   steps:
     - setup-go-workspace
