@@ -1,4 +1,5 @@
 {
+  "id": "ExternalReference",
   "type": "object",
   "properties": {
     "stringType": {

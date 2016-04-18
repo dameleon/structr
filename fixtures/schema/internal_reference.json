@@ -1,4 +1,6 @@
 {
+  "id": "InternalReference",
+
   "definitions": {
     "refObjectType": {
       "type": "object",

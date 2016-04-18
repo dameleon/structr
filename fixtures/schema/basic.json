@@ -1,4 +1,5 @@
 {
+  "id": "Basic",
   "type": "object",
   "properties": {
     "stringType": {
