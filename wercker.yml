@@ -10,3 +10,9 @@ build:
         name: go test
         code: |
           go test -v ./...
+    - tcnksm/gox:
+      os: "darwin linux windows"
+      arch: "386 amd64"
+    - tcnksm/zip:
+      input: $WERCKER_OUTPUT_DIR/pkg
+      output: $WERCKER_OUTPUT_DIR/dist
