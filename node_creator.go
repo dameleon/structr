@@ -10,12 +10,11 @@ type NodeCreator interface {
 	CreateTypeNode(bundle Bundle, additionalKey string) (TypeNode, error)
 }
 
-func NewJsonSchemaNodeCreator(context Context, bundler JsonSchemaBundler) NodeCreator {
-	return &jsonSchemaNodeCreator{context, bundler}
+func NewJsonSchemaNodeCreator(bundler JsonSchemaBundler) NodeCreator {
+	return &jsonSchemaNodeCreator{bundler}
 }
 
 type jsonSchemaNodeCreator struct {
-	context Context
 	bundler JsonSchemaBundler
 }
 

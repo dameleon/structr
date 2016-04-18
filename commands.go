@@ -42,7 +42,7 @@ var commandGenerate = cli.Command{
 		if err := bundler.AddJsonSchema(context.Inputs...); err != nil {
 			log.Fatalln("cannot add load json schema: ", err.Error())
 		}
-		creator := NewJsonSchemaNodeCreator(context, bundler)
+		creator := NewJsonSchemaNodeCreator(bundler)
 		exporter := NewExporter(context)
 		for _, b := range bundler.GetBundles() {
 			if !b.Schema.HasStructure() {
