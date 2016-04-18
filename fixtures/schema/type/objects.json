@@ -5,10 +5,10 @@
       "type": "string"
     },
     "bar": {
-      "type": "string"
+      "type": "integer"
     },
     "baz": {
-      "type": "string"
+      "type": "number"
     }
   }
 }
