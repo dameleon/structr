@@ -1,0 +1,82 @@
+{
+  "id": "InternalReference",
+
+  "definitions": {
+    "refObjectType": {
+      "type": "object",
+      "properties": {
+        "foo": {
+          "type": "string"
+        },
+        "bar": {
+          "type": "integer"
+        },
+        "baz": {
+          "type": "number"
+        },
+        "nested": {
+          "type": "object",
+          "properties": {
+            "foo": {
+              "type": "string"
+            },
+            "bar": {
+              "type": "integer"
+            },
+            "baz": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "refArrayType": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "foo": {
+            "type": "string"
+          },
+          "bar": {
+            "type": "integer"
+          },
+          "baz": {
+            "type": "number"
+          },
+          "nested": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/refObjectType"
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "type": "object",
+  "properties": {
+    "stringType": {
+      "type": "string"
+    },
+    "integerType": {
+      "type": "integer"
+    },
+    "numberType": {
+      "type": "number"
+    },
+    "booleanType": {
+      "type": "boolean"
+    },
+    "nullType": {
+      "type": "null"
+    },
+    "objectType": {
+      "$ref": "#/definitions/refObjectType"
+    },
+    "arrayType": {
+      "$ref": "#/definitions/refArrayType"
+    }
+  }
+}

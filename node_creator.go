@@ -10,12 +10,11 @@ type NodeCreator interface {
 	CreateTypeNode(bundle Bundle, additionalKey string) (TypeNode, error)
 }
 
-func NewJsonSchemaNodeCreator(context Context, bundler JsonSchemaBundler) NodeCreator {
-	return &jsonSchemaNodeCreator{context, bundler}
+func NewJsonSchemaNodeCreator(bundler JsonSchemaBundler) NodeCreator {
+	return &jsonSchemaNodeCreator{bundler}
 }
 
 type jsonSchemaNodeCreator struct {
-	context Context
 	bundler JsonSchemaBundler
 }
 
@@ -58,7 +57,7 @@ func (creator *jsonSchemaNodeCreator) CreateStructureNode(name string, rootBundl
 				}
 			}
 			_, ok := childrenMap[name]
-			if rootBundle.IsSameRef(bdl) && bdl.HasParent && !ok {
+			if bdl.Schema.HasStructure() && rootBundle.IsSameRef(bdl) && bdl.HasParent && !ok {
 				child, err := creator.CreateStructureNode(name, bdl)
 				if err != nil {
 					return StructureNode{}, err

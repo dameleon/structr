@@ -8,13 +8,13 @@ import (
 
 type Bundle struct {
 	Name       string
-	Ref        gojsonreference.JsonReference
+	Ref        *gojsonreference.JsonReference
 	Schema     JsonSchema
 	IsReferred bool
 	HasParent  bool
 }
 
-func NewBundle(ref gojsonreference.JsonReference, schema JsonSchema, isReferred bool) Bundle {
+func NewBundle(ref *gojsonreference.JsonReference, schema JsonSchema, isReferred bool) Bundle {
 	var name string
 	if schema.Id != "" {
 		name = schema.Id
@@ -38,7 +38,7 @@ func (b Bundle) GetRelativeJsonReference(path string) (gojsonreference.JsonRefer
 	if err != nil {
 		return ref, err
 	}
-	return NewRelativeJsonReference(b.Ref, ref)
+	return NewRelativeJsonReference(b.Ref, &ref)
 }
 
 func (b Bundle) IsSameRef(bundle Bundle) bool {

@@ -2,12 +2,13 @@ package main
 
 import (
 	"github.com/xeipuuv/gojsonreference"
+	"fmt"
 )
 
 type JsonSchemaBundler interface {
 	AddJsonSchema(paths ...string) error
 	GetBundles() map[string]Bundle
-	GetBundle(ref gojsonreference.JsonReference) Bundle
+	GetBundle(ref gojsonreference.JsonReference) (Bundle, bool)
 	GetReferredBundleWalk(bundle Bundle) (Bundle, error)
 }
 
@@ -34,19 +35,28 @@ func (b *bundler) AddJsonSchema(paths ...string) error {
 		if err != nil {
 			return err
 		}
-		bdl := NewBundle(ref, schema, false)
-		for _, r := range bdl.Schema.GetRefList() {
-			ref, err := bdl.GetRelativeJsonReference(r)
-			if err != nil {
-				return err
-			}
-			schema, err := b.loader.Load(ref)
-			if err != nil {
-				return err
-			}
-			b.registerNewBundle(NewBundle(ref, schema, true))
+		bdl := NewBundle(&ref, schema, false)
+		if err := b.registerReferredBundleWalk(bdl); err != nil {
+			return err
 		}
 		b.registerNewBundle(bdl)
+	}
+	return nil
+}
+
+func (b *bundler) registerReferredBundleWalk(bundle Bundle) (error) {
+	for _, r := range bundle.Schema.GetRefList() {
+		ref, err := bundle.GetRelativeJsonReference(r)
+		if err != nil {
+			return err
+		}
+		schema, err := b.loader.Load(ref)
+		if err != nil {
+			return err
+		}
+		bdl := NewBundle(&ref, schema, true)
+		b.registerNewBundle(bdl)
+		b.registerReferredBundleWalk(bdl)
 	}
 	return nil
 }
@@ -62,11 +72,9 @@ func (b *bundler) GetBundles() map[string]Bundle {
 	return b.bundles
 }
 
-func (b *bundler) GetBundle(ref gojsonreference.JsonReference) Bundle {
-	if bdl, ok := b.bundles[ref.String()]; ok {
-		return bdl
-	}
-	panic("undefined bundle")
+func (b *bundler) GetBundle(ref gojsonreference.JsonReference) (Bundle, bool) {
+	res, ok := b.bundles[ref.String()]
+	return res, ok
 }
 
 func (b *bundler) GetReferredBundleWalk(bundle Bundle) (Bundle, error) {
@@ -77,6 +85,9 @@ func (b *bundler) GetReferredBundleWalk(bundle Bundle) (Bundle, error) {
 	if err != nil {
 		return bundle, err
 	}
-	refBundle := b.GetBundle(ref)
+	refBundle, ok := b.GetBundle(ref)
+	if !ok {
+		return refBundle, fmt.Errorf("undefined bundle. REF: %s", ref.String())
+	}
 	return b.GetReferredBundleWalk(refBundle)
 }
