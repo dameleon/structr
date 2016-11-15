@@ -7,44 +7,44 @@ import (
 	"path/filepath"
 )
 
-type Context struct {
+type Bedrock struct {
 	Config        Config
 	OutputDirPath string
 	Inputs        []string
 }
 
-func NewContext(configFilePath string, outDir string, args cli.Args) (Context, error) {
-	var context Context
+func NewBedrock(configFilePath string, outDir string, args cli.Args) (Bedrock, error) {
+	var b Bedrock
 	wd, err := os.Getwd()
 	if err != nil {
-		return context, err
+		return b, err
 	}
 	// create & register config
 	if configFilePath == "" {
-		return context, errors.New("config flag must be specified")
+		return b, errors.New("config flag must be specified")
 	} else if !filepath.IsAbs(configFilePath) {
 		configFilePath = filepath.Join(wd, configFilePath)
 	}
 	config, err := NewConfig(configFilePath)
 	if err != nil {
-		return context, err
+		return b, err
 	}
-	context.Config = config
+	b.Config = config
 	// register out dir if specified
 	if outDir != "" && !filepath.IsAbs(outDir) {
 		outDir = filepath.Join(wd, outDir)
 	}
-	context.OutputDirPath = outDir
+	b.OutputDirPath = outDir
 	// register inputs
 	inputs, err := createInputs(args, wd)
 	if err != nil {
-		return context, err
+		return b, err
 	}
-	context.Inputs = inputs
-	return context, nil
+	b.Inputs = inputs
+	return b, nil
 }
 
-func (c Context) OutputsFiles() bool {
+func (c Bedrock) OutputsFiles() bool {
 	return c.OutputDirPath != ""
 }
 

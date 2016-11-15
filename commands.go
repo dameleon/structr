@@ -34,16 +34,16 @@ var commandGenerate = cli.Command{
 			cli.ShowAppHelp(c)
 			os.Exit(1)
 		}
-		context, err := NewContext(c.String("config"), c.String("outDir"), args)
+		bedrock, err := NewBedrock(c.String("config"), c.String("outDir"), args)
 		if err != nil {
 			log.Fatalln("initialize error: ", err.Error())
 		}
 		bundler := NewJsonSchemaBundler(NewJsonSchemaLoader())
-		if err := bundler.AddJsonSchema(context.Inputs...); err != nil {
+		if err := bundler.AddJsonSchema(bedrock.Inputs...); err != nil {
 			log.Fatalln("cannot add load json schema: ", err.Error())
 		}
 		creator := NewJsonSchemaNodeCreator(bundler)
-		exporter := NewExporter(context)
+		exporter := NewExporter(bedrock)
 		for _, b := range bundler.GetBundles() {
 			if !b.Schema.HasStructure() {
 				continue
