@@ -25,7 +25,7 @@ func (it InputType) String() string {
 	}
 }
 
-func (it InputType) ExtNames() []string {
+func (it InputType) extNames() []string {
 	switch it {
 	case INPUT_TYPE_JSON:
 		return []string{".json"}

@@ -38,7 +38,7 @@ func NewBedrock(configFilePath string, inputType string, outDir string, args cli
 	}
 	b.OutputDirPath = outDir
 	// register inputs
-	inputs, err := createInputs(args, b.InputType.ExtNames(), wd)
+	inputs, err := createInputs(args, b.InputType.extNames(), wd)
 	if err != nil {
 		return b, err
 	}

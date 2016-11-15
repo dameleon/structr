@@ -12,14 +12,14 @@ type jsonSchemaNodeCreator struct {
 	bundler JsonSchemaBundler
 }
 
-func (creator *jsonSchemaNodeCreator) CreateStructureNode(name string, rootBundle JsonSchemaBundle) (StructureNode, error) {
+func (creator *jsonSchemaNodeCreator) createStructureNode(name string, rootBundle JsonSchemaBundle) (StructureNode, error) {
 	rootBundle, err := creator.bundler.GetReferredBundleWalk(rootBundle)
 	if err != nil {
 		return StructureNode{}, err
 	}
 	rootSchema := rootBundle.Schema
 	if rootSchema.Type == JsonSchemaTypeArray {
-		return creator.CreateStructureNode(name, NewChildJsonSchemaBundle(rootBundle, rootSchema.GetItemList()[0]))
+		return creator.createStructureNode(name, NewChildJsonSchemaBundle(rootBundle, rootSchema.GetItemList()[0]))
 	} else if rootSchema.Type != JsonSchemaTypeObject {
 		return StructureNode{}, fmt.Errorf("root schema must be object type. TYPE: %s", rootSchema.Type.String())
 	}
@@ -35,7 +35,7 @@ func (creator *jsonSchemaNodeCreator) CreateStructureNode(name string, rootBundl
 			return node, err
 		}
 		// create property
-		prop, err := creator.CreatePropertyNode(key, bdl, rootSchema.IsRequired(key))
+		prop, err := creator.createPropertyNode(key, bdl, rootSchema.IsRequired(key))
 		if err != nil {
 			return StructureNode{}, err
 		}
@@ -52,7 +52,7 @@ func (creator *jsonSchemaNodeCreator) CreateStructureNode(name string, rootBundl
 			}
 			_, ok := childrenMap[name]
 			if bdl.Schema.HasStructure() && rootBundle.IsSameRef(bdl) && bdl.HasParent && !ok {
-				child, err := creator.CreateStructureNode(name, bdl)
+				child, err := creator.createStructureNode(name, bdl)
 				if err != nil {
 					return StructureNode{}, err
 				}
@@ -67,8 +67,8 @@ func (creator *jsonSchemaNodeCreator) CreateStructureNode(name string, rootBundl
 	return node, nil
 }
 
-func (creator *jsonSchemaNodeCreator) CreatePropertyNode(name string, bundle JsonSchemaBundle, isRequired bool) (PropertyNode, error) {
-	typeNode, err := creator.CreateTypeNode(bundle, name)
+func (creator *jsonSchemaNodeCreator) createPropertyNode(name string, bundle JsonSchemaBundle, isRequired bool) (PropertyNode, error) {
+	typeNode, err := creator.createTypeNode(bundle, name)
 	if err != nil {
 		return PropertyNode{}, err
 	}
@@ -79,7 +79,7 @@ func (creator *jsonSchemaNodeCreator) CreatePropertyNode(name string, bundle Jso
 	}, nil
 }
 
-func (creator *jsonSchemaNodeCreator) CreateTypeNode(bdl JsonSchemaBundle, additionalKey string) (TypeNode, error) {
+func (creator *jsonSchemaNodeCreator) createTypeNode(bdl JsonSchemaBundle, additionalKey string) (TypeNode, error) {
 	schema := bdl.Schema
 	switch {
 	case schema.Type.IsPrimitiveSchemaType():
@@ -91,7 +91,7 @@ func (creator *jsonSchemaNodeCreator) CreateTypeNode(bdl JsonSchemaBundle, addit
 			return TypeNode{}, err
 		}
 		// create inner type recursive
-		innerNode, err := creator.CreateTypeNode(innerBundle, additionalKey)
+		innerNode, err := creator.createTypeNode(innerBundle, additionalKey)
 		if err != nil {
 			return TypeNode{}, err
 		}
@@ -115,12 +115,12 @@ func newObjectTypeNode(containType TypeNode) TypeNode {
 	return TypeNode{JsonSchemaTypeObject, &containType}
 }
 
-func (creator *jsonSchemaNodeCreator) ExportTo(exporter Exporter) error {
+func (creator *jsonSchemaNodeCreator) Create(exporter Exporter) error {
 	for _, b := range creator.bundler.GetBundles() {
 		if !b.Schema.HasStructure() {
 			continue
 		}
-		structure, err := creator.CreateStructureNode(b.Name, b)
+		structure, err := creator.createStructureNode(b.Name, b)
 		if err != nil {
 			return err
 		}

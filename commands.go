@@ -54,7 +54,7 @@ var commandGenerate = cli.Command{
 		case INPUT_TYPE_UNKNOWN:
 			log.Fatalln("unknown input type")
 		}
-		if err := creator.ExportTo(NewExporter(bedrock)); err != nil {
+		if err := creator.Create(NewExporter(bedrock)); err != nil {
 			log.Fatalln("failed export: ", err.Error())
 		}
 	},
