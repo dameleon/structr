@@ -43,12 +43,20 @@ var commandGenerate = cli.Command{
 		if err != nil {
 			log.Fatalln("initialize error: ", err.Error())
 		}
-		bundler := NewJsonSchemaBundler(NewJsonSchemaLoader())
-		if err := bundler.AddJsonSchema(bedrock.Inputs...); err != nil {
-			log.Fatalln("cannot add load json schema: ", err.Error())
+		var creator NodeCreator
+		switch bedrock.InputType {
+		case INPUT_TYPE_JSON:
+			bundler := NewJsonSchemaBundler(NewJsonSchemaLoader())
+			if err := bundler.AddJsonSchema(bedrock.Inputs...); err != nil {
+				log.Fatalln("cannot add load json schema: ", err.Error())
+			}
+			creator = NewJsonSchemaNodeCreator(bundler)
+		case INPUT_TYPE_UNKNOWN:
+			log.Fatalln("unknown input type")
 		}
-		creator := NewJsonSchemaNodeCreator(bundler)
-		creator.ExportTo(NewExporter(bedrock))
+		if err := creator.ExportTo(NewExporter(bedrock)); err != nil {
+			log.Fatalln("failed export: ", err.Error())
+		}
 	},
 }
 
