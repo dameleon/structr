@@ -8,12 +8,12 @@ import (
 func TestJsonSchemaNodeCreator_CreateStructureNode_WithBasicJsonSchema(t *testing.T) {
 	bundler := NewJsonSchemaBundler(NewJsonSchemaLoader())
 	bundler.AddJsonSchema(fixtures.BasicJsonSchemaRef.GetUrl().Path)
-	creator := NewJsonSchemaNodeCreator(bundler)
+	creator := jsonSchemaNodeCreator{bundler}
 	bundle, ok := bundler.GetBundle(fixtures.BasicJsonSchemaRef)
 	if ok != true {
 		t.Fatal("cannot get root bundle")
 	}
-	node, err := creator.CreateStructureNode("Basic", bundle)
+	node, err := creator.createStructureNode("Basic", bundle)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -70,12 +70,12 @@ func TestJsonSchemaNodeCreator_CreateStructureNode_WithBasicJsonSchema(t *testin
 func TestJsonSchemaNodeCreator_CreateStructureNode_WithInternalReferenceSchema(t *testing.T) {
 	bundler := NewJsonSchemaBundler(NewJsonSchemaLoader())
 	bundler.AddJsonSchema(fixtures.InternalReferenceSchemaRef.GetUrl().Path)
-	creator := NewJsonSchemaNodeCreator(bundler)
+	creator := jsonSchemaNodeCreator{bundler}
 	bundle, ok := bundler.GetBundle(fixtures.InternalReferenceSchemaRef)
 	if ok != true {
 		t.Fatal("cannot get root bundle")
 	}
-	node, err := creator.CreateStructureNode("InternalReferenceSchema", bundle)
+	node, err := creator.createStructureNode("InternalReferenceSchema", bundle)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -89,7 +89,7 @@ func TestJsonSchemaNodeCreator_CreateStructureNode_WithInternalReferenceSchema(t
 	{
 		ref, _ := bundle.GetRelativeJsonReference("#/definitions/refObjectType")
 		bundle, _ := bundler.GetBundle(ref)
-		node, err := creator.CreateStructureNode("refObjectType", bundle)
+		node, err := creator.createStructureNode("refObjectType", bundle)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -109,7 +109,7 @@ func TestJsonSchemaNodeCreator_CreateStructureNode_WithInternalReferenceSchema(t
 	{
 		ref, _ := bundle.GetRelativeJsonReference("#/definitions/refArrayType")
 		bundle, _ := bundler.GetBundle(ref)
-		node, err := creator.CreateStructureNode("refArrayType", bundle)
+		node, err := creator.createStructureNode("refArrayType", bundle)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -130,12 +130,12 @@ func TestJsonSchemaNodeCreator_CreateStructureNode_WithInternalReferenceSchema(t
 func TestJsonSchemaNodeCreator_CreateStructureNode_WithExternalReferenceSchema(t *testing.T) {
 	bundler := NewJsonSchemaBundler(NewJsonSchemaLoader())
 	bundler.AddJsonSchema(fixtures.ExternalReferenceSchemaRef.GetUrl().Path)
-	creator := NewJsonSchemaNodeCreator(bundler)
+	creator := jsonSchemaNodeCreator{bundler}
 	bundle, ok := bundler.GetBundle(fixtures.ExternalReferenceSchemaRef)
 	if ok != true {
 		t.Fatal("cannot get root bundle")
 	}
-	node, err := creator.CreateStructureNode("ExternalReferenceSchema", bundle)
+	node, err := creator.createStructureNode("ExternalReferenceSchema", bundle)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -149,7 +149,7 @@ func TestJsonSchemaNodeCreator_CreateStructureNode_WithExternalReferenceSchema(t
 	{
 		ref, _ := bundle.GetRelativeJsonReference("./type/objects.json")
 		bundle, _ := bundler.GetBundle(ref)
-		node, err := creator.CreateStructureNode("Objects", bundle)
+		node, err := creator.createStructureNode("Objects", bundle)
 		if err != nil {
 			t.Fatal(err)
 		}
