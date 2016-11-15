@@ -28,7 +28,7 @@ func (it InputType) String() string {
 func (it InputType) ExtNames() []string {
 	switch it {
 	case INPUT_TYPE_JSON:
-		return []string{"json"}
+		return []string{".json"}
 	default:
 		return []string{}
 	}
