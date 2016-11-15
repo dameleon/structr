@@ -50,7 +50,7 @@ func (e *fileExporter) Export(node StructureNode) error {
 	if err != nil {
 		return err
 	}
-	if err := e.mkdirIfNeeded(); err != nil {
+	if err := os.MkdirAll(e.bedrock.OutputDirPath, os.ModePerm); err != nil {
 		return err
 	}
 	filename, err := e.getFileName(node)
@@ -58,18 +58,6 @@ func (e *fileExporter) Export(node StructureNode) error {
 		return err
 	}
 	return ioutil.WriteFile(filepath.Join(e.bedrock.OutputDirPath, filename), []byte(str), os.ModePerm)
-}
-
-func (e *fileExporter) mkdirIfNeeded() error {
-	info, err := os.Stat(e.bedrock.OutputDirPath)
-	if info != nil && info.IsDir() {
-		return nil
-	}
-	if os.IsNotExist(err) {
-		return os.MkdirAll(e.bedrock.OutputDirPath, os.ModePerm)
-	}
-	return err
-
 }
 
 func (e *fileExporter) getFileName(node StructureNode) (string, error) {
