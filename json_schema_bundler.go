@@ -7,20 +7,20 @@ import (
 
 type JsonSchemaBundler interface {
 	AddJsonSchema(paths ...string) error
-	GetBundles() map[string]Bundle
-	GetBundle(ref gojsonreference.JsonReference) (Bundle, bool)
-	GetReferredBundleWalk(bundle Bundle) (Bundle, error)
+	GetBundles() map[string]JsonSchemaBundle
+	GetBundle(ref gojsonreference.JsonReference) (JsonSchemaBundle, bool)
+	GetReferredBundleWalk(bundle JsonSchemaBundle) (JsonSchemaBundle, error)
 }
 
 type bundler struct {
 	loader  JsonSchemaLoader
-	bundles map[string]Bundle
+	bundles map[string]JsonSchemaBundle
 }
 
 func NewJsonSchemaBundler(loader JsonSchemaLoader) JsonSchemaBundler {
 	b := &bundler{
 		loader:  loader,
-		bundles: make(map[string]Bundle),
+		bundles: make(map[string]JsonSchemaBundle),
 	}
 	return b
 }
@@ -35,16 +35,16 @@ func (b *bundler) AddJsonSchema(paths ...string) error {
 		if err != nil {
 			return err
 		}
-		bdl := NewBundle(&ref, schema, false)
+		bdl := NewJsonSchemaBundle(&ref, schema, false)
 		if err := b.registerReferredBundleWalk(bdl); err != nil {
 			return err
 		}
-		b.registerNewBundle(bdl)
+		b.registerNewJsonSchemaBundle(bdl)
 	}
 	return nil
 }
 
-func (b *bundler) registerReferredBundleWalk(bundle Bundle) error {
+func (b *bundler) registerReferredBundleWalk(bundle JsonSchemaBundle) error {
 	for _, r := range bundle.Schema.GetRefList() {
 		ref, err := bundle.GetRelativeJsonReference(r)
 		if err != nil {
@@ -54,30 +54,30 @@ func (b *bundler) registerReferredBundleWalk(bundle Bundle) error {
 		if err != nil {
 			return err
 		}
-		bdl := NewBundle(&ref, schema, true)
-		b.registerNewBundle(bdl)
+		bdl := NewJsonSchemaBundle(&ref, schema, true)
+		b.registerNewJsonSchemaBundle(bdl)
 		b.registerReferredBundleWalk(bdl)
 	}
 	return nil
 }
 
-func (b *bundler) registerNewBundle(bdl Bundle) {
+func (b *bundler) registerNewJsonSchemaBundle(bdl JsonSchemaBundle) {
 	if _, ok := b.bundles[bdl.Ref.String()]; ok {
 		return
 	}
 	b.bundles[bdl.Ref.String()] = bdl
 }
 
-func (b *bundler) GetBundles() map[string]Bundle {
+func (b *bundler) GetBundles() map[string]JsonSchemaBundle {
 	return b.bundles
 }
 
-func (b *bundler) GetBundle(ref gojsonreference.JsonReference) (Bundle, bool) {
+func (b *bundler) GetBundle(ref gojsonreference.JsonReference) (JsonSchemaBundle, bool) {
 	res, ok := b.bundles[ref.String()]
 	return res, ok
 }
 
-func (b *bundler) GetReferredBundleWalk(bundle Bundle) (Bundle, error) {
+func (b *bundler) GetReferredBundleWalk(bundle JsonSchemaBundle) (JsonSchemaBundle, error) {
 	if !bundle.Schema.HasReference() {
 		return bundle, nil
 	}

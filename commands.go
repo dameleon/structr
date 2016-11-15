@@ -23,6 +23,11 @@ var commandGenerate = cli.Command{
 			Usage: "(REQUIRED) configuration file for structr",
 		},
 		cli.StringFlag{
+			Name: "type, t",
+			Value: "json",
+			Usage: "input file type",
+		},
+		cli.StringFlag{
 			Name:  "outDir",
 			Value: "",
 			Usage: "output directory for generated structure",
@@ -34,27 +39,23 @@ var commandGenerate = cli.Command{
 			cli.ShowAppHelp(c)
 			os.Exit(1)
 		}
-		context, err := NewContext(c.String("config"), c.String("outDir"), args)
+		bedrock, err := NewBedrock(c.String("config"), c.String("type"), c.String("outDir"), args)
 		if err != nil {
 			log.Fatalln("initialize error: ", err.Error())
 		}
-		bundler := NewJsonSchemaBundler(NewJsonSchemaLoader())
-		if err := bundler.AddJsonSchema(context.Inputs...); err != nil {
-			log.Fatalln("cannot add load json schema: ", err.Error())
+		var creator NodeCreator
+		switch bedrock.InputType {
+		case INPUT_TYPE_JSON:
+			bundler := NewJsonSchemaBundler(NewJsonSchemaLoader())
+			if err := bundler.AddJsonSchema(bedrock.Inputs...); err != nil {
+				log.Fatalln("cannot add load json schema: ", err.Error())
+			}
+			creator = NewJsonSchemaNodeCreator(bundler)
+		case INPUT_TYPE_UNKNOWN:
+			log.Fatalln("unknown input type")
 		}
-		creator := NewJsonSchemaNodeCreator(bundler)
-		exporter := NewExporter(context)
-		for _, b := range bundler.GetBundles() {
-			if !b.Schema.HasStructure() {
-				continue
-			}
-			structure, err := creator.CreateStructureNode(b.Name, b)
-			if err != nil {
-				log.Fatalln("cannot create structure node: ", err.Error())
-			}
-			if err := exporter.Export(structure); err != nil {
-				log.Fatalln("cannot export structure node: ", err.Error())
-			}
+		if err := creator.Create(NewExporter(bedrock)); err != nil {
+			log.Fatalln("failed export: ", err.Error())
 		}
 	},
 }

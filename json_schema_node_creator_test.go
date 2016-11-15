@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/dameleon/structr/fixtures"
 	"testing"
+	"github.com/dameleon/structr/fixtures"
 )
 
 func TestJsonSchemaNodeCreator_CreateStructureNode_WithBasicJsonSchema(t *testing.T) {

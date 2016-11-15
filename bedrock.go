@@ -7,48 +7,50 @@ import (
 	"path/filepath"
 )
 
-type Context struct {
+type Bedrock struct {
 	Config        Config
 	OutputDirPath string
 	Inputs        []string
+	InputType     InputType
 }
 
-func NewContext(configFilePath string, outDir string, args cli.Args) (Context, error) {
-	var context Context
+func NewBedrock(configFilePath string, inputType string, outDir string, args cli.Args) (Bedrock, error) {
+	var b Bedrock
 	wd, err := os.Getwd()
 	if err != nil {
-		return context, err
+		return b, err
 	}
+	b.InputType = StringToInputMode(inputType)
 	// create & register config
 	if configFilePath == "" {
-		return context, errors.New("config flag must be specified")
+		return b, errors.New("config flag must be specified")
 	} else if !filepath.IsAbs(configFilePath) {
 		configFilePath = filepath.Join(wd, configFilePath)
 	}
 	config, err := NewConfig(configFilePath)
 	if err != nil {
-		return context, err
+		return b, err
 	}
-	context.Config = config
+	b.Config = config
 	// register out dir if specified
 	if outDir != "" && !filepath.IsAbs(outDir) {
 		outDir = filepath.Join(wd, outDir)
 	}
-	context.OutputDirPath = outDir
+	b.OutputDirPath = outDir
 	// register inputs
-	inputs, err := createInputs(args, wd)
+	inputs, err := createInputs(args, b.InputType.extNames(), wd)
 	if err != nil {
-		return context, err
+		return b, err
 	}
-	context.Inputs = inputs
-	return context, nil
+	b.Inputs = inputs
+	return b, nil
 }
 
-func (c Context) OutputsFiles() bool {
+func (c Bedrock) OutputsFiles() bool {
 	return c.OutputDirPath != ""
 }
 
-func createInputs(args cli.Args, wd string) ([]string, error) {
+func createInputs(args cli.Args, allowExts []string, wd string) ([]string, error) {
 	res := []string{}
 	for _, arg := range args {
 		files, err := filepath.Glob(arg)
@@ -60,10 +62,19 @@ func createInputs(args cli.Args, wd string) ([]string, error) {
 			if err != nil {
 				return res, err
 			}
-			if !info.IsDir() {
-				res = append(res, filepath.Join(wd, arg))
+			if !info.IsDir() && contains(allowExts, filepath.Ext(file)) {
+				res = append(res, filepath.Join(wd, file))
 			}
 		}
 	}
 	return res, nil
+}
+
+func contains(list []string, target string) bool {
+	for _, val := range list {
+		if val == target {
+			return true
+		}
+	}
+	return false
 }
