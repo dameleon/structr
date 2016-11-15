@@ -48,19 +48,7 @@ var commandGenerate = cli.Command{
 			log.Fatalln("cannot add load json schema: ", err.Error())
 		}
 		creator := NewJsonSchemaNodeCreator(bundler)
-		exporter := NewExporter(bedrock)
-		for _, b := range bundler.GetBundles() {
-			if !b.Schema.HasStructure() {
-				continue
-			}
-			structure, err := creator.CreateStructureNode(b.Name, b)
-			if err != nil {
-				log.Fatalln("cannot create structure node: ", err.Error())
-			}
-			if err := exporter.Export(structure); err != nil {
-				log.Fatalln("cannot export structure node: ", err.Error())
-			}
-		}
+		creator.ExportTo(NewExporter(bedrock))
 	},
 }
 

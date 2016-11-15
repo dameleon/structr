@@ -8,6 +8,7 @@ type NodeCreator interface {
 	CreateStructureNode(name string, bundle Bundle) (StructureNode, error)
 	CreatePropertyNode(name string, bundle Bundle, isRequired bool) (PropertyNode, error)
 	CreateTypeNode(bundle Bundle, additionalKey string) (TypeNode, error)
+	ExportTo(exporter Exporter) error
 }
 
 func NewJsonSchemaNodeCreator(bundler JsonSchemaBundler) NodeCreator {
@@ -119,4 +120,20 @@ func newArrayTypeNode(containType TypeNode) TypeNode {
 
 func newObjectTypeNode(containType TypeNode) TypeNode {
 	return TypeNode{JsonSchemaTypeObject, &containType}
+}
+
+func (creator *jsonSchemaNodeCreator) ExportTo(exporter Exporter) error {
+	for _, b := range creator.bundler.GetBundles() {
+		if !b.Schema.HasStructure() {
+			continue
+		}
+		structure, err := creator.CreateStructureNode(b.Name, b)
+		if err != nil {
+			return err
+		}
+		if err := exporter.Export(structure); err != nil {
+			return err
+		}
+	}
+	return nil
 }
