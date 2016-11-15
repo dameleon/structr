@@ -23,6 +23,11 @@ var commandGenerate = cli.Command{
 			Usage: "(REQUIRED) configuration file for structr",
 		},
 		cli.StringFlag{
+			Name: "type, t",
+			Value: "json",
+			Usage: "input file type",
+		},
+		cli.StringFlag{
 			Name:  "outDir",
 			Value: "",
 			Usage: "output directory for generated structure",
@@ -34,7 +39,7 @@ var commandGenerate = cli.Command{
 			cli.ShowAppHelp(c)
 			os.Exit(1)
 		}
-		bedrock, err := NewBedrock(c.String("config"), c.String("outDir"), args)
+		bedrock, err := NewBedrock(c.String("config"), c.String("type"), c.String("outDir"), args)
 		if err != nil {
 			log.Fatalln("initialize error: ", err.Error())
 		}
