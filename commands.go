@@ -23,7 +23,7 @@ var commandGenerate = cli.Command{
 			Usage: "(REQUIRED) configuration file for structr",
 		},
 		cli.StringFlag{
-			Name: "type, t",
+			Name:  "type, t",
 			Value: "json",
 			Usage: "input file type",
 		},
