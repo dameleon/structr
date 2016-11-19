@@ -1,34 +1,19 @@
 package main
 
-type InputType int
+type InputType string
 
 const (
-	INPUT_TYPE_UNKNOWN InputType = iota
-	INPUT_TYPE_JSON
+	INPUT_TYPE_UNKNOWN InputType = "unknown"
+	INPUT_TYPE_JSON = "json"
+	INPUT_TYPE_API_BLUEPRINT = "api_blueprint"
 )
-
-func StringToInputMode(str string) InputType {
-	switch str {
-	case INPUT_TYPE_JSON.String():
-		return INPUT_TYPE_JSON
-	default:
-		return INPUT_TYPE_UNKNOWN
-	}
-}
-
-func (it InputType) String() string {
-	switch it {
-	case INPUT_TYPE_JSON:
-		return "json"
-	default:
-		return "unknown"
-	}
-}
 
 func (it InputType) extNames() []string {
 	switch it {
 	case INPUT_TYPE_JSON:
 		return []string{".json"}
+	case INPUT_TYPE_API_BLUEPRINT:
+		return []string{".md", ".apib"}
 	default:
 		return []string{}
 	}
