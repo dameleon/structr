@@ -10,6 +10,7 @@ import (
 var Commands = []cli.Command{
 	commandGenerate,
 	commandTemplate,
+	commandEnvironment,
 }
 
 var commandGenerate = cli.Command{
@@ -70,5 +71,18 @@ var commandTemplate = cli.Command{
 			log.Fatalln("cannot load configuration template: ", err)
 		}
 		fmt.Print(string(bytes[:]))
+	},
+}
+
+var commandEnvironment = cli.Command{
+	Name:      "env",
+	Usage:     "Print environment",
+	UsageText: "structr env",
+	Action: func(c *cli.Context) {
+		env := NewEnvironment()
+		fmt.Printf("Usable: json_schema: %t, API Blueprint: %t\n", env.JsonSchema, env.ApiBlueprint)
+		if env.ApiBlueprint {
+			fmt.Printf("drafter(API Blueprint) bin path: %s\n", env.drafterBinPath)
+		}
 	},
 }
