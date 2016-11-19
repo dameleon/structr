@@ -12,15 +12,17 @@ type Bedrock struct {
 	OutputDirPath string
 	Inputs        []string
 	InputType     InputType
+	Environment   Environment
 }
 
 func NewBedrock(configFilePath string, inputType string, outDir string, args cli.Args) (Bedrock, error) {
 	var b Bedrock
+	b.Environment = NewEnvironment()
 	wd, err := os.Getwd()
 	if err != nil {
 		return b, err
 	}
-	b.InputType = StringToInputMode(inputType)
+	b.InputType = InputType(inputType)
 	// create & register config
 	if configFilePath == "" {
 		return b, errors.New("config flag must be specified")
