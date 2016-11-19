@@ -33,6 +33,7 @@ type Environment struct {
 }
 
 func NewEnvironment() Environment {
+	// NOTE: JsonSchema is always true
 	env := Environment{true, false, ""}
 	if binPath := os.Getenv(DRAFTER_BIN_ENV_VAR); binPath != "" {
 		info, err := os.Stat(binPath)
