@@ -52,7 +52,9 @@ var commandGenerate = cli.Command{
 				log.Fatalln("cannot add load json schema: ", err.Error())
 			}
 			creator = NewJsonSchemaNodeCreator(bundler)
-		case INPUT_TYPE_UNKNOWN:
+		case INPUT_TYPE_API_BLUEPRINT:
+
+		default:
 			log.Fatalln("unknown input type")
 		}
 		if err := creator.Create(NewExporter(bedrock)); err != nil {
